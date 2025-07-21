@@ -79,11 +79,19 @@
       }
       .todo-item p {
         font-size: 2vh;
-        margin-bottom: 3vh;
+        margin-bottom: 2vh;
+        white-space: pre-wrap;
+      }
+      .todo-item a {
+        font-size: 1.8vh;
+        display: inline-block;
+        margin-top: 1vh;
+        word-break: break-all;
       }
       .todo-actions {
         display: flex;
         gap: 2vh;
+        margin-top: 2vh;
       }
       .main-btn {
         display: block;
@@ -121,6 +129,7 @@
       <h3 id="form-title"></h3>
       <input id="judul" placeholder="Judul" />
       <textarea id="detail" placeholder="Detail"></textarea>
+      <input id="referensi" placeholder="Link Referensi (Opsional)" />
       <div class="todo-actions">
         <button onclick="simpan()">Simpan</button>
         <button onclick="batal()">Batal</button>
@@ -139,7 +148,16 @@
         todos.forEach((t, i) => {
           const d = document.createElement("div");
           d.className = "todo-item";
-          d.innerHTML = `<h4>${t.judul}</h4><p>${t.detail}</p>`;
+          const detailWithLineBreaks = t.detail.replace(/\n/g, "<br>");
+          d.innerHTML = `<h4>${t.judul}</h4><p>${detailWithLineBreaks}</p>`;
+          if (t.referensi?.trim()) {
+            const link = document.createElement("a");
+            link.href = t.referensi;
+            link.target = "_blank";
+            link.rel = "noopener noreferrer";
+            link.textContent = t.referensi;
+            d.appendChild(link);
+          }
           const a = document.createElement("div");
           a.className = "todo-actions";
           ["Edit", "Selesai"].forEach((txt, j) => {
@@ -162,23 +180,27 @@
       const showForm = (i = -1) => {
         $("todo-form").style.display = "block";
         $("form-title").textContent = i >= 0 ? "Edit Todo" : "Aku mau...";
-        ["judul", "detail"].forEach(
-          (f, idx) => ($(f).value = i >= 0 ? todos[i][f] : "")
-        );
+        $("judul").value = i >= 0 ? todos[i].judul : "";
+        $("detail").value = i >= 0 ? todos[i].detail : "";
+        $("referensi").value = i >= 0 ? todos[i].referensi || "" : "";
         editIndex = i;
       };
       const batal = () => {
         $("todo-form").style.display = "none";
-        ["judul", "detail"].forEach((f) => ($(f).value = ""));
+        ["judul", "detail", "referensi"].forEach((f) => ($(f).value = ""));
         editIndex = -1;
       };
       const simpan = () => {
         const judul = $("judul").value.trim(),
-          detail = $("detail").value.trim();
+          detail = $("detail").value.trim(),
+          referensi = $("referensi").value.trim();
         if (!judul) return alert("Judul harus diisi!");
-        editIndex >= 0
-          ? (todos[editIndex] = { judul, detail })
-          : todos.push({ judul, detail });
+        const todo = { judul, detail, referensi };
+        if (editIndex >= 0) {
+          todos[editIndex] = todo;
+        } else {
+          todos.push(todo);
+        }
         simpanLS();
         batal();
         render();
