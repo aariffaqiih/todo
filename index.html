@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Mau Ngapain?</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Literata:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      * {
+        margin: 0;
+        box-sizing: border-box;
+      }
+      *:hover {
+        transition: all 1s;
+      }
+      body {
+        font-family: Literata, serif;
+        max-width: 50vw;
+        margin: auto;
+        padding: 6vh 0;
+        transition: 0.5s;
+      }
+      .dark-toggle {
+        position: fixed;
+        top: 2vh;
+        right: 2vw;
+        z-index: 1;
+      }
+      h1 {
+        text-align: center;
+        font-size: 6vh;
+        margin-bottom: 4vh;
+      }
+      button,
+      input,
+      textarea {
+        font-size: 2vh;
+        border-radius: 1vh;
+        border: none;
+        padding: 1.5vh;
+        transition: 0.5s;
+      }
+      button {
+        background: black;
+        color: white;
+        cursor: pointer;
+      }
+      input,
+      textarea {
+        width: 100%;
+        margin-bottom: 2vh;
+        border: 0.1vh solid black;
+        background: white;
+        color: black;
+      }
+      textarea {
+        resize: none;
+        height: 12vh;
+      }
+      #todo-form,
+      .todo-item {
+        border: 0.1vh solid black;
+        padding: 4vh;
+        border-radius: 2vh;
+        margin-bottom: 4vh;
+      }
+      #todo-form {
+        display: none;
+      }
+      #todo-form h3 {
+        font-size: 3vh;
+        margin-bottom: 3vh;
+      }
+      .todo-item h4 {
+        font-size: 2.5vh;
+        margin-bottom: 1.5vh;
+      }
+      .todo-item p {
+        font-size: 2vh;
+        margin-bottom: 3vh;
+      }
+      .todo-actions {
+        display: flex;
+        gap: 2vh;
+      }
+      .main-btn {
+        display: block;
+        margin: 0 auto 6vh;
+      }
+      :focus {
+        outline: none;
+        box-shadow: none;
+      }
+      .dark-mode {
+        background: black;
+        color: white;
+      }
+      .dark-mode input,
+      .dark-mode textarea {
+        background: black;
+        color: white;
+        border-color: white;
+      }
+      .dark-mode #todo-form,
+      .dark-mode .todo-item {
+        border-color: white;
+      }
+      .dark-mode button {
+        background: white;
+        color: black;
+      }
+    </style>
+  </head>
+  <body>
+    <button class="dark-toggle" onclick="toggleDarkMode()">Dark Mode</button>
+    <h1>Mau Ngapain?</h1>
+    <button class="main-btn" onclick="showForm()">+ Tambah</button>
+    <div id="todo-form">
+      <h3 id="form-title"></h3>
+      <input id="judul" placeholder="Judul" />
+      <textarea id="detail" placeholder="Detail"></textarea>
+      <div class="todo-actions">
+        <button onclick="simpan()">Simpan</button>
+        <button onclick="batal()">Batal</button>
+      </div>
+    </div>
+    <div id="todo-list"></div>
+    <script>
+      let todos = [],
+        editIndex = -1;
+      const $ = (id) => document.getElementById(id);
+      const simpanLS = () =>
+        localStorage.setItem("todos", JSON.stringify(todos));
+      const render = () => {
+        const list = $("todo-list");
+        list.innerHTML = "";
+        todos.forEach((t, i) => {
+          const d = document.createElement("div");
+          d.className = "todo-item";
+          d.innerHTML = `<h4>${t.judul}</h4><p>${t.detail}</p>`;
+          const a = document.createElement("div");
+          a.className = "todo-actions";
+          ["Edit", "Selesai"].forEach((txt, j) => {
+            const b = document.createElement("button");
+            b.textContent = txt;
+            b.onclick = () => (j ? hapus(i) : showForm(i));
+            a.appendChild(b);
+          });
+          d.appendChild(a);
+          list.appendChild(d);
+        });
+      };
+      const toggleDarkMode = () => {
+        document.body.classList.toggle("dark-mode");
+        localStorage.setItem(
+          "darkMode",
+          document.body.classList.contains("dark-mode")
+        );
+      };
+      const showForm = (i = -1) => {
+        $("todo-form").style.display = "block";
+        $("form-title").textContent = i >= 0 ? "Edit Todo" : "Aku mau...";
+        ["judul", "detail"].forEach(
+          (f, idx) => ($(f).value = i >= 0 ? todos[i][f] : "")
+        );
+        editIndex = i;
+      };
+      const batal = () => {
+        $("todo-form").style.display = "none";
+        ["judul", "detail"].forEach((f) => ($(f).value = ""));
+        editIndex = -1;
+      };
+      const simpan = () => {
+        const judul = $("judul").value.trim(),
+          detail = $("detail").value.trim();
+        if (!judul) return alert("Judul harus diisi!");
+        editIndex >= 0
+          ? (todos[editIndex] = { judul, detail })
+          : todos.push({ judul, detail });
+        simpanLS();
+        batal();
+        render();
+      };
+      const hapus = (i) => {
+        if (confirm("Tandai selesai dan hapus todo ini?")) {
+          todos.splice(i, 1);
+          simpanLS();
+          render();
+        }
+      };
+      onload = () => {
+        const s = localStorage.getItem("todos");
+        if (s) todos = JSON.parse(s);
+        if (localStorage.getItem("darkMode") === "true")
+          document.body.classList.add("dark-mode");
+        render();
+      };
+    </script>
+  </body>
+</html>
