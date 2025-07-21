@@ -11,16 +11,16 @@
       * {
         margin: 0;
         box-sizing: border-box;
+        font-family: "Literata", serif;
       }
       *:hover {
         transition: all 1s;
       }
       body {
-        font-family: Literata, serif;
         max-width: 50vw;
         margin: auto;
         padding: 6vh 0;
-        transition: 0.5s;
+        transition: all 1s;
       }
       .dark-toggle {
         position: fixed;
@@ -36,11 +36,11 @@
       button,
       input,
       textarea {
-        font-size: 2vh;
+        font-size: 1.8vh;
         border-radius: 1vh;
         border: none;
-        padding: 1.5vh;
-        transition: 0.5s;
+        padding: 1.5vh 3vh;
+        transition: all 1s;
       }
       button {
         background: black;
@@ -57,7 +57,7 @@
       }
       textarea {
         resize: none;
-        height: 12vh;
+        height: 20vh;
       }
       #todo-form,
       .todo-item {
@@ -65,6 +65,7 @@
         padding: 4vh;
         border-radius: 2vh;
         margin-bottom: 4vh;
+        transition: border 1s;
       }
       #todo-form {
         display: none;
@@ -79,14 +80,15 @@
       }
       .todo-item p {
         font-size: 2vh;
-        margin-bottom: 2vh;
         white-space: pre-wrap;
       }
       .todo-item a {
-        font-size: 1.8vh;
+        color: blue;
+        text-decoration: none;
+        font-size: 2vh;
         display: inline-block;
-        margin-top: 1vh;
         word-break: break-all;
+        transition: color 1s;
       }
       .todo-actions {
         display: flex;
@@ -111,6 +113,9 @@
         color: white;
         border-color: white;
       }
+      .dark-mode .todo-item a {
+        color: cyan;
+      }
       .dark-mode #todo-form,
       .dark-mode .todo-item {
         border-color: white;
@@ -122,14 +127,17 @@
     </style>
   </head>
   <body>
-    <button class="dark-toggle" onclick="toggleDarkMode()">Dark Mode</button>
+    <button class="dark-toggle" onclick="toggleDarkMode()" id="modeBtn">
+      Dark Mode
+    </button>
     <h1>Mau Ngapain?</h1>
     <button class="main-btn" onclick="showForm()">+ Tambah</button>
     <div id="todo-form">
       <h3 id="form-title"></h3>
       <input id="judul" placeholder="Judul" />
       <textarea id="detail" placeholder="Detail"></textarea>
-      <input id="referensi" placeholder="Link Referensi (Opsional)" />
+      <input id="referensi" placeholder="Link" />
+      <input id="deadline" type="date" /> <input id="time" type="time" />
       <div class="todo-actions">
         <button onclick="simpan()">Simpan</button>
         <button onclick="batal()">Batal</button>
@@ -142,7 +150,23 @@
       const $ = (id) => document.getElementById(id);
       const simpanLS = () =>
         localStorage.setItem("todos", JSON.stringify(todos));
+      const formatCountdown = (ms) => {
+        const total = Math.max(0, Math.floor(ms / 1000));
+        const d = Math.floor(total / 86400);
+        const h = Math.floor((total % 86400) / 3600);
+        const m = Math.floor((total % 3600) / 60);
+        return `${d}h ${h}j ${m}m`;
+      };
       const render = () => {
+        todos.sort((a, b) => {
+          const da = new Date(
+            (a.deadline || "") + "T" + (a.time || "00:00")
+          ).getTime();
+          const db = new Date(
+            (b.deadline || "") + "T" + (b.time || "00:00")
+          ).getTime();
+          return da - db;
+        });
         const list = $("todo-list");
         list.innerHTML = "";
         todos.forEach((t, i) => {
@@ -158,6 +182,15 @@
             link.textContent = t.referensi;
             d.appendChild(link);
           }
+          if (t.deadline?.trim()) {
+            const deadlineText = document.createElement("p");
+            deadlineText.textContent =
+              "Deadline: " + t.deadline + " " + (t.time || "00:00");
+            d.appendChild(deadlineText);
+            const countdown = document.createElement("p");
+            countdown.id = `countdown-${i}`;
+            d.appendChild(countdown);
+          }
           const a = document.createElement("div");
           a.className = "todo-actions";
           ["Edit", "Selesai"].forEach((txt, j) => {
@@ -170,12 +203,25 @@
           list.appendChild(d);
         });
       };
+      const updateCountdowns = () => {
+        todos.forEach((t, i) => {
+          const el = document.getElementById(`countdown-${i}`);
+          if (el && t.deadline) {
+            const dt = new Date(t.deadline + "T" + (t.time || "00:00"));
+            const now = new Date();
+            const diff = dt.getTime() - now.getTime();
+            el.textContent = "Sisa waktu: " + formatCountdown(diff);
+          }
+        });
+      };
+      setInterval(updateCountdowns, 1000);
       const toggleDarkMode = () => {
-        document.body.classList.toggle("dark-mode");
-        localStorage.setItem(
-          "darkMode",
-          document.body.classList.contains("dark-mode")
-        );
+        const body = document.body;
+        const modeBtn = $("modeBtn");
+        body.classList.toggle("dark-mode");
+        const dark = body.classList.contains("dark-mode");
+        localStorage.setItem("darkMode", dark);
+        modeBtn.textContent = dark ? "Light Mode" : "Dark Mode";
       };
       const showForm = (i = -1) => {
         $("todo-form").style.display = "block";
@@ -183,19 +229,25 @@
         $("judul").value = i >= 0 ? todos[i].judul : "";
         $("detail").value = i >= 0 ? todos[i].detail : "";
         $("referensi").value = i >= 0 ? todos[i].referensi || "" : "";
+        $("deadline").value = i >= 0 ? todos[i].deadline || "" : "";
+        $("time").value = i >= 0 ? todos[i].time || "" : "";
         editIndex = i;
       };
       const batal = () => {
         $("todo-form").style.display = "none";
-        ["judul", "detail", "referensi"].forEach((f) => ($(f).value = ""));
+        ["judul", "detail", "referensi", "deadline", "time"].forEach(
+          (f) => ($(f).value = "")
+        );
         editIndex = -1;
       };
       const simpan = () => {
         const judul = $("judul").value.trim(),
           detail = $("detail").value.trim(),
-          referensi = $("referensi").value.trim();
+          referensi = $("referensi").value.trim(),
+          deadline = $("deadline").value.trim(),
+          time = $("time").value.trim();
         if (!judul) return alert("Judul harus diisi!");
-        const todo = { judul, detail, referensi };
+        const todo = { judul, detail, referensi, deadline, time };
         if (editIndex >= 0) {
           todos[editIndex] = todo;
         } else {
@@ -215,8 +267,9 @@
       onload = () => {
         const s = localStorage.getItem("todos");
         if (s) todos = JSON.parse(s);
-        if (localStorage.getItem("darkMode") === "true")
-          document.body.classList.add("dark-mode");
+        const dark = localStorage.getItem("darkMode") === "true";
+        if (dark) document.body.classList.add("dark-mode");
+        $("modeBtn").textContent = dark ? "Light Mode" : "Dark Mode";
         render();
       };
     </script>
