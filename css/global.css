@@ -1,0 +1,320 @@
+@import url("https://fonts.googleapis.com/css2?family=Literata:ital,opsz,wght@0,7..72,300;0,7..72,400;0,7..72,500;1,7..72,300;1,7..72,400&display=swap");
+:root {
+  --color-primary: #2a2a2a;
+  --color-secondary: #555;
+  --color-tertiary: #8a8a8a;
+  --color-quaternary: #e0e0e0;
+  --color-bg: #fafafa;
+  --color-white: #ffffff;
+  --color-green-dark: #45894c;
+  --color-green-mid: #6aaa71;
+  --color-green-light: #cee8c3;
+  --color-green-pale: #edf6e9;
+  --color-ink: #1a1a1a;
+  --color-surface: #f5f5f5;
+  --size-3-02: calc(-3vh * 0.2);
+  --size-1x01: calc(1vh * 0.1);
+  --size-1x06: calc(1vh * 0.6);
+  --size-3x-1: calc(3vh * 0.1);
+  --size-3x-4: calc(3vh * 0.4);
+  --size-3x-6: calc(3vh * 0.6);
+  --size-3x-8: calc(3vh * 0.8);
+  --size-3x01: calc(3vh * 1);
+  --size-3x_2: calc(3vh * 1.2);
+  --size-3x_5: calc(3vh * 1.5);
+  --size-3x02: calc(3vh * 2);
+  --size-3x_7: calc(3vh * 2.7);
+  --size-3x03: calc(3vh * 3);
+  --size-3x04: calc(3vh * 4);
+  --size-3x05: calc(3vh * 5);
+  --size-3x06: calc(3vh * 6);
+  --size-3x07: calc(3vh * 7);
+  --size-3x08: calc(3vh * 8);
+  --size-3x09: calc(3vh * 9);
+  --size-3x10: calc(3vh * 10);
+  --size-3x11: calc(3vh * 11);
+  --size-3x12: calc(3vh * 12);
+  --size-3x13: calc(3vh * 13);
+  --size-3x14: calc(3vh * 14);
+  --size-3x15: calc(3vh * 15);
+  --size-3x16: calc(3vh * 16);
+  --size-3x17: calc(3vh * 17);
+  --size-3x18: calc(3vh * 18);
+  --size-3x19: calc(3vh * 19);
+  --size-3x20: calc(3vh * 20);
+  --size-3x21: calc(3vh * 21);
+  --size-3x22: calc(3vh * 22);
+  --size-3x23: calc(3vh * 23);
+  --size-3x24: calc(3vh * 24);
+  --size-3x25: calc(3vh * 25);
+  --size-3x26: calc(3vh * 26);
+  --size-3x27: calc(3vh * 27);
+  --size-3x28: calc(3vh * 28);
+  --size-3x30: calc(3vh * 30);
+  --transition-fast: 0.2s ease;
+  --transition-smooth: 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  --transition-slow: 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+*,
+*::before,
+*::after {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+* {
+  font-family: "Literata", serif;
+  font-optical-sizing: auto;
+  font-style: normal;
+  cursor: default;
+  text-decoration: none;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+html {
+  scroll-behavior: smooth;
+}
+body {
+  background: var(--color-bg);
+  color: var(--color-primary);
+  overflow-x: hidden;
+}
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-weight: 500;
+  color: var(--color-primary);
+  line-height: 1.1;
+}
+h1 {
+  font-size: var(--size-3x05);
+  letter-spacing: var(--size-3-02);
+}
+h2 {
+  font-size: var(--size-3x04);
+  letter-spacing: var(--size-3-02);
+}
+h3 {
+  font-size: var(--size-3x02);
+  line-height: var(--size-3x_7);
+}
+h4,
+i {
+  font-size: var(--size-3x01);
+}
+h5 {
+  font-size: var(--size-3x-6);
+  font-weight: 500;
+}
+p,
+b,
+li {
+  font-size: var(--size-3x-6);
+  line-height: var(--size-3x01);
+  text-align: justify;
+}
+p {
+  color: var(--color-secondary);
+  font-weight: 400;
+}
+b {
+  color: var(--color-primary);
+  font-weight: 500;
+}
+a {
+  color: inherit;
+  text-decoration: none;
+  cursor: pointer;
+}
+._0_page {
+  position: fixed;
+  top: var(--size-3x02);
+  left: 50%;
+  transform: translateX(-50%);
+  gap: var(--size-3x02);
+  padding: var(--size-3x-6) var(--size-3x01);
+  border-radius: 100vh;
+  backdrop-filter: blur(var(--size-1x06));
+  -webkit-backdrop-filter: blur(var(--size-1x06));
+  z-index: 100;
+  border: var(--size-1x01) solid var(--color-quaternary);
+  background: rgba(255, 255, 255, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+._0_page p {
+  transition: color var(--transition-fast);
+  color: var(--color-tertiary);
+  cursor: pointer;
+  min-width: max-content;
+  font-size: var(--size-3x-6);
+  letter-spacing: 0.03em;
+}
+._0_page p:hover,
+._0_page p.active {
+  color: var(--color-primary);
+}
+._1_face,
+._2_me,
+._4_link,
+._4_link a {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+._1_face,
+._2_me {
+  background: var(--color-white);
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  width: 100%;
+}
+._4_link {
+  position: fixed;
+  bottom: var(--size-3x02);
+  left: 50%;
+  transform: translateX(-50%);
+  gap: var(--size-3x02);
+  padding: var(--size-3x-6) var(--size-3x01);
+  border-radius: 100vh;
+  backdrop-filter: blur(var(--size-1x06));
+  -webkit-backdrop-filter: blur(var(--size-1x06));
+  z-index: 100;
+  border: var(--size-1x01) solid var(--color-quaternary);
+  background: rgba(255, 255, 255, 0.7);
+}
+._4_link i {
+  color: var(--color-tertiary);
+  cursor: pointer;
+  transition: color var(--transition-fast);
+}
+._4_link i:hover {
+  color: var(--color-primary);
+}
+@media screen and (orientation: portrait) {
+  h1 {
+    font-size: var(--size-3x03);
+    letter-spacing: var(--size-3-02);
+  }
+  h2 {
+    font-size: var(--size-3x02);
+  }
+}
+@media print {
+  * {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  body > *:not(#printArea) {
+    display: none !important;
+  }
+  #printArea {
+    display: block !important;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: 11pt;
+    color: #000;
+    margin: 0;
+    padding: 0;
+  }
+  .print-page {
+    width: 100%;
+    padding: 20mm 25mm;
+    page-break-after: always;
+    box-sizing: border-box;
+  }
+  .print-page:last-child {
+    page-break-after: auto;
+  }
+  .print-title {
+    font-size: 14pt;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 16pt;
+    border-bottom: 2pt solid #000;
+    padding-bottom: 8pt;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .print-section {
+    margin-bottom: 14pt;
+    page-break-inside: avoid;
+  }
+  .print-section-header {
+    font-size: 11pt;
+    font-weight: bold;
+    margin-bottom: 4pt;
+    border-bottom: 0.5pt solid #999;
+    padding-bottom: 2pt;
+  }
+  .print-section p,
+  .print-section li,
+  .print-section span {
+    font-size: 11pt;
+    line-height: 1.5;
+    color: #000;
+    text-align: left;
+  }
+  .print-section ul {
+    margin-left: 18pt;
+    padding: 0;
+  }
+  .print-section li {
+    list-style: disc;
+    margin-bottom: 2pt;
+  }
+  .print-section .indent {
+    margin-left: 12pt;
+  }
+  .print-note {
+    font-size: 9.5pt;
+    color: #555;
+    font-style: italic;
+    margin-bottom: 6pt;
+  }
+  .print-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 4pt;
+    font-size: 10pt;
+  }
+  .print-table th,
+  .print-table td {
+    border: 0.5pt solid #444;
+    padding: 4pt 6pt;
+    text-align: left;
+    vertical-align: top;
+  }
+  .print-table th {
+    background: #e8e8e8;
+    font-weight: bold;
+  }
+  .print-table td {
+    min-height: 20pt;
+  }
+  .print-blank-row td {
+    height: 24pt;
+  }
+  .print-identitas {
+    background: #f5f5f5;
+    padding: 8pt 10pt;
+    margin-bottom: 14pt;
+    border-left: 3pt solid #000;
+    page-break-inside: avoid;
+  }
+  .print-identitas p {
+    margin-bottom: 2pt;
+  }
+  .print-score {
+    font-size: 12pt;
+    font-weight: bold;
+  }
+  @page {
+    size: A4;
+    margin: 20mm 25mm;
+  }
+}
