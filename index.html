@@ -2,130 +2,276 @@
 <html lang="id">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>'Aarif Faqiih - Journal</title>
-    <meta
-      name="description"
-      content="Catatan harian dan mingguan perjalanan belajar data science oleh 'Aarif Faqiih."
-    />
-    <link rel="stylesheet" href="./css/global.css" />
-    <link rel="stylesheet" href="./css/home.css" />
+    <title>Mau Ngapain?</title>
     <link
+      href="https://fonts.googleapis.com/css2?family=Literata:wght@400;600&display=swap"
       rel="stylesheet"
-      type="text/css"
-      href="https://cdn.jsdelivr.net/npm/@phosphor-icons/web@2.1.1/src/regular/style.css"
     />
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <style>
+      * {
+        margin: 0;
+        box-sizing: border-box;
+        font-family: "Literata", serif;
+      }
+      *:hover {
+        transition: all 1s;
+      }
+      body {
+        max-width: 50vw;
+        margin: auto;
+        padding: 6vh 0;
+        transition: all 1s;
+      }
+      .dark-toggle {
+        position: fixed;
+        top: 2vh;
+        right: 2vw;
+        z-index: 1;
+      }
+      h1 {
+        text-align: center;
+        font-size: 6vh;
+        margin-bottom: 4vh;
+      }
+      button,
+      input,
+      textarea {
+        font-size: 1.8vh;
+        border-radius: 1vh;
+        border: none;
+        padding: 1.5vh 3vh;
+        transition: all 1s;
+      }
+      button {
+        background: black;
+        color: white;
+        cursor: pointer;
+      }
+      input,
+      textarea {
+        width: 100%;
+        margin-bottom: 2vh;
+        border: 0.1vh solid black;
+        background: white;
+        color: black;
+      }
+      textarea {
+        resize: none;
+        height: 20vh;
+      }
+      #todo-form,
+      .todo-item {
+        border: 0.1vh solid black;
+        padding: 4vh;
+        border-radius: 2vh;
+        margin-bottom: 4vh;
+        transition: border 1s;
+      }
+      #todo-form {
+        display: none;
+      }
+      #todo-form h3 {
+        font-size: 3vh;
+        margin-bottom: 3vh;
+      }
+      .todo-item h4 {
+        font-size: 2.5vh;
+        margin-bottom: 1.5vh;
+      }
+      .todo-item p {
+        font-size: 2vh;
+        white-space: pre-wrap;
+      }
+      .todo-item a {
+        color: blue;
+        text-decoration: none;
+        font-size: 2vh;
+        display: inline-block;
+        word-break: break-all;
+        transition: color 1s;
+      }
+      .todo-actions {
+        display: flex;
+        gap: 2vh;
+        margin-top: 2vh;
+      }
+      .main-btn {
+        display: block;
+        margin: 0 auto 6vh;
+      }
+      :focus {
+        outline: none;
+        box-shadow: none;
+      }
+      .dark-mode {
+        background: black;
+        color: white;
+      }
+      .dark-mode input,
+      .dark-mode textarea {
+        background: black;
+        color: white;
+        border-color: white;
+      }
+      .dark-mode .todo-item a {
+        color: cyan;
+      }
+      .dark-mode #todo-form,
+      .dark-mode .todo-item {
+        border-color: white;
+      }
+      .dark-mode button {
+        background: white;
+        color: black;
+      }
+    </style>
   </head>
   <body>
-    <section class="_1_face" id="_1_face">
-      <canvas id="dataParticles"></canvas>
-      <h1>'Aarif <span>Faqiih</span></h1>
-      <p id="heroSubtitle">Junior Data Science Practitioner</p>
-    </section>
-    <section class="_2_me" id="_2_me">
-      <div class="text">
-        <h2 id="greeting">Hello</h2>
-        <p id="bio">Memuat...</p>
-      </div>
-      <div class="photo" id="photoEl">
-        <span class="photo-placeholder" aria-hidden="true">&#128100;</span>
-      </div>
-    </section>
-    <section class="_3_journal" id="_3_journal">
-      <div class="journal-header">
-        <h3>Jurnal Saya</h3>
-        <p>Catatan harian &amp; mingguan perjalanan belajar</p>
-        <div class="filter-pills">
-          <button class="filter-btn active" data-filter="all">Semua</button>
-          <button class="filter-btn" data-filter="daily">Harian</button>
-          <button class="filter-btn" data-filter="weekly">Mingguan</button>
-        </div>
-      </div>
-      <div class="journal-grid" id="journalGrid" aria-live="polite"></div>
-      <div
-        id="weeklyDetailContainer"
-        class="weekly-detail-container"
-        style="display: none"
-      >
-        <div class="detail-header">
-          <button id="backToGridBtn" class="back-btn">
-            <i class="ph ph-arrow-left"></i> Kembali
-          </button>
-          <div class="detail-actions">
-            <button class="btn-docx" id="weeklyDocxBtn">
-              <i class="ph ph-file-doc"></i> Unduh .docx
-            </button>
-            <button class="btn-print" id="weeklyPrintBtn">
-              <i class="ph ph-printer"></i> Cetak PDF
-            </button>
-          </div>
-        </div>
-        <div id="weeklyIdentity" class="weekly-identity"></div>
-        <div id="weeklyDetailContent" class="weekly-detail-content"></div>
-      </div>
-    </section>
-    <div class="_4_link">
-      <a
-        href="https://github.com/"
-        target="_blank"
-        rel="noopener"
-        aria-label="GitHub"
-      >
-        <i class="ph ph-github-logo"></i>
-      </a>
-      <a
-        href="https://linkedin.com/"
-        target="_blank"
-        rel="noopener"
-        aria-label="LinkedIn"
-      >
-        <i class="ph ph-linkedin-logo"></i>
-      </a>
-      <a href="/cdn-cgi/l/email-protection#9d" aria-label="Email">
-        <i class="ph ph-envelope-simple"></i>
-      </a>
-      <a
-        href="https://wa.me/"
-        target="_blank"
-        rel="noopener"
-        aria-label="WhatsApp"
-      >
-        <i class="ph ph-whatsapp-logo"></i>
-      </a>
-    </div>
-    <div
-      class="_journal-modal"
-      id="journalModal"
-      role="dialog"
-      aria-modal="true"
-      aria-label="Detail Jurnal"
-    >
-      <div class="modal-backdrop" id="modalBackdrop"></div>
-      <div class="modal-panel" id="modalPanel">
-        <div class="modal-top-bar">
-          <div class="modal-label">
-            <span class="card-badge" id="modalBadge">Harian</span>
-            <span class="modal-date" id="modalDate"></span>
-          </div>
-          <button class="modal-close" id="modalClose" aria-label="Tutup">
-            <i class="ph ph-x"></i>
-          </button>
-        </div>
-        <div class="modal-body" id="modalBody"></div>
-        <div class="modal-footer">
-          <button class="btn-docx" id="btnDocx">
-            <i class="ph ph-file-doc"></i> Unduh .docx
-          </button>
-          <button class="btn-print" id="btnPrint">
-            <i class="ph ph-printer"></i> Cetak PDF
-          </button>
-        </div>
+    <button class="dark-toggle" onclick="toggleDarkMode()" id="modeBtn">
+      Dark Mode
+    </button>
+    <h1>Mau Ngapain?</h1>
+    <button class="main-btn" onclick="showForm()">+ Tambah</button>
+    <div id="todo-form">
+      <h3 id="form-title"></h3>
+      <input id="judul" placeholder="Judul" />
+      <textarea id="detail" placeholder="Detail"></textarea>
+      <input id="referensi" placeholder="Link" />
+      <input id="deadline" type="date" /> <input id="time" type="time" />
+      <div class="todo-actions">
+        <button onclick="simpan()">Simpan</button>
+        <button onclick="batal()">Batal</button>
       </div>
     </div>
-    <div id="printArea" aria-hidden="true"></div>
-    <script src="./js/data.js"></script>
-    <script src="./js/template-schema.js"></script>
-    <script src="./js/home.js"></script>
+    <div id="todo-list"></div>
+    <script>
+      let todos = [],
+        editIndex = -1;
+      const $ = (id) => document.getElementById(id);
+      const simpanLS = () =>
+        localStorage.setItem("todos", JSON.stringify(todos));
+      const formatCountdown = (ms) => {
+        const total = Math.max(0, Math.floor(ms / 1000));
+        const d = Math.floor(total / 86400);
+        const h = Math.floor((total % 86400) / 3600);
+        const m = Math.floor((total % 3600) / 60);
+        return `${d}h ${h}j ${m}m`;
+      };
+      const render = () => {
+        todos.sort((a, b) => {
+          const da = new Date(
+            (a.deadline || "") + "T" + (a.time || "00:00")
+          ).getTime();
+          const db = new Date(
+            (b.deadline || "") + "T" + (b.time || "00:00")
+          ).getTime();
+          return da - db;
+        });
+        const list = $("todo-list");
+        list.innerHTML = "";
+        todos.forEach((t, i) => {
+          const d = document.createElement("div");
+          d.className = "todo-item";
+          const detailWithLineBreaks = t.detail.replace(/\n/g, "<br>");
+          d.innerHTML = `<h4>${t.judul}</h4><p>${detailWithLineBreaks}</p>`;
+          if (t.referensi?.trim()) {
+            const link = document.createElement("a");
+            link.href = t.referensi;
+            link.target = "_blank";
+            link.rel = "noopener noreferrer";
+            link.textContent = t.referensi;
+            d.appendChild(link);
+          }
+          if (t.deadline?.trim()) {
+            const deadlineText = document.createElement("p");
+            deadlineText.textContent =
+              "Deadline: " + t.deadline + " " + (t.time || "00:00");
+            d.appendChild(deadlineText);
+            const countdown = document.createElement("p");
+            countdown.id = `countdown-${i}`;
+            d.appendChild(countdown);
+          }
+          const a = document.createElement("div");
+          a.className = "todo-actions";
+          ["Edit", "Selesai"].forEach((txt, j) => {
+            const b = document.createElement("button");
+            b.textContent = txt;
+            b.onclick = () => (j ? hapus(i) : showForm(i));
+            a.appendChild(b);
+          });
+          d.appendChild(a);
+          list.appendChild(d);
+        });
+      };
+      const updateCountdowns = () => {
+        todos.forEach((t, i) => {
+          const el = document.getElementById(`countdown-${i}`);
+          if (el && t.deadline) {
+            const dt = new Date(t.deadline + "T" + (t.time || "00:00"));
+            const now = new Date();
+            const diff = dt.getTime() - now.getTime();
+            el.textContent = "Sisa waktu: " + formatCountdown(diff);
+          }
+        });
+      };
+      setInterval(updateCountdowns, 1000);
+      const toggleDarkMode = () => {
+        const body = document.body;
+        const modeBtn = $("modeBtn");
+        body.classList.toggle("dark-mode");
+        const dark = body.classList.contains("dark-mode");
+        localStorage.setItem("darkMode", dark);
+        modeBtn.textContent = dark ? "Light Mode" : "Dark Mode";
+      };
+      const showForm = (i = -1) => {
+        $("todo-form").style.display = "block";
+        $("form-title").textContent = i >= 0 ? "Edit Todo" : "Aku mau...";
+        $("judul").value = i >= 0 ? todos[i].judul : "";
+        $("detail").value = i >= 0 ? todos[i].detail : "";
+        $("referensi").value = i >= 0 ? todos[i].referensi || "" : "";
+        $("deadline").value = i >= 0 ? todos[i].deadline || "" : "";
+        $("time").value = i >= 0 ? todos[i].time || "" : "";
+        editIndex = i;
+      };
+      const batal = () => {
+        $("todo-form").style.display = "none";
+        ["judul", "detail", "referensi", "deadline", "time"].forEach(
+          (f) => ($(f).value = "")
+        );
+        editIndex = -1;
+      };
+      const simpan = () => {
+        const judul = $("judul").value.trim(),
+          detail = $("detail").value.trim(),
+          referensi = $("referensi").value.trim(),
+          deadline = $("deadline").value.trim(),
+          time = $("time").value.trim();
+        if (!judul) return alert("Judul harus diisi!");
+        const todo = { judul, detail, referensi, deadline, time };
+        if (editIndex >= 0) {
+          todos[editIndex] = todo;
+        } else {
+          todos.push(todo);
+        }
+        simpanLS();
+        batal();
+        render();
+      };
+      const hapus = (i) => {
+        if (confirm("Tandai selesai dan hapus todo ini?")) {
+          todos.splice(i, 1);
+          simpanLS();
+          render();
+        }
+      };
+      onload = () => {
+        const s = localStorage.getItem("todos");
+        if (s) todos = JSON.parse(s);
+        const dark = localStorage.getItem("darkMode") === "true";
+        if (dark) document.body.classList.add("dark-mode");
+        $("modeBtn").textContent = dark ? "Light Mode" : "Dark Mode";
+        render();
+      };
+    </script>
   </body>
 </html>
