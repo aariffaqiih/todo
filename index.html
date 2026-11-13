@@ -1,1484 +1,1444 @@
 <!DOCTYPE html>
 <html lang="id" data-theme="light">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="description" content="Mau Ngapain? Catatan kecil untuk hal-hal yang ingin kamu kerjakan." />
-  <title>Mau Ngapain?</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="color-scheme" content="light dark">
+<meta name="description" content="Pencatat rencana harian: atur prioritas, pantau tenggat, simpan otomatis di perangkat.">
+<title>Mau Ngapain?</title>
 
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,400;12..96,500;12..96,700;12..96,800&family=Instrument+Sans:ital,wght@0,400;0,500;0,600;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/regular/style.css" />
-  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/bold/style.css" />
-  <link rel="stylesheet" href="https://unpkg.com/@phosphor-icons/web@2.1.1/src/fill/style.css" />
+<script>
+  (function () {
+    try {
+      var stored = localStorage.getItem('theme');
+      var mode = stored === 'dark' || stored === 'light'
+        ? stored
+        : (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+      document.documentElement.dataset.theme = mode;
+    } catch (err) {
+      document.documentElement.dataset.theme = 'light';
+    }
+  })();
+</script>
 
-  <style>
-    /* ============================================
-       TOKENS
-       ============================================ */
-    :root {
-      --paper: #edece6;
-      --paper-2: #e4e3db;
-      --paper-3: #d8d7ce;
-      --ink: #141412;
-      --ink-2: #5b5b52;
-      --ink-3: #8f8f84;
-      --rule: #c6c5ba;
-      --accent: #e5421d;
-      --accent-ink: #fff6f0;
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Google+Sans:ital,opsz,wght@0,17..18,400..700;1,17..18,400..700&display=swap" rel="stylesheet">
 
-      --font-display: "Bricolage Grotesque", "Instrument Sans", system-ui, sans-serif;
-      --font-body: "Instrument Sans", system-ui, -apple-system, sans-serif;
-      --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", monospace;
+<style>
+/* =========================================================================
+   TOKENS
+   Palette: Google News 15-color set.
+   Radius scale (locked): inputs 8px, cards 14px, dialogs 22px, buttons pill.
+   ========================================================================= */
+:root {
+  color-scheme: light;
 
-      --s1: 0.25rem; --s2: 0.5rem;  --s3: 0.75rem; --s4: 1rem;
-      --s5: 1.5rem;  --s6: 2rem;    --s7: 3rem;    --s8: 4rem; --s9: 6rem;
+  --c-blue:      #174EA6;
+  --c-red:       #A50E0E;
+  --c-orange:    #E37400;
+  --c-green:     #0D652D;
+  --c-blue-m:    #4285F4;
+  --c-red-m:     #EA4335;
+  --c-yellow:    #FBBC04;
+  --c-green-m:   #34A853;
+  --c-blue-l:    #D2E3FC;
+  --c-red-l:     #FAD2CF;
+  --c-yellow-l:  #FEEFC3;
+  --c-green-l:   #CEEAD6;
+  --c-grey-l:    #F1F3F4;
+  --c-grey:      #9AA0A6;
+  --c-black:     #202124;
 
-      --r-xs: 2px; --r-sm: 4px; --r: 8px; --r-lg: 14px;
+  --surface:        #f6f7f8;
+  --surface-raised: #fefefe;
+  --surface-sunken: var(--c-grey-l);
 
-      --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
-      --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
-      --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
-      --dur-1: 140ms; --dur-2: 220ms; --dur-3: 340ms; --dur-4: 500ms;
+  --text:       var(--c-black);
+  --text-soft:  color-mix(in oklab, var(--c-black) 68%, var(--surface-raised));
+  --text-faint: color-mix(in oklab, var(--c-black) 46%, var(--surface-raised));
 
-      --max-w: 56rem;
-      --gutter: clamp(1rem, 4vw, 2rem);
-    }
+  --line:        color-mix(in oklab, var(--c-black) 13%, var(--surface-raised));
+  --line-strong: color-mix(in oklab, var(--c-black) 24%, var(--surface-raised));
 
-    [data-theme="dark"] {
-      --paper: #121211;   --paper-2: #1a1a18;  --paper-3: #242421;
-      --ink: #f0efe8;     --ink-2: #a5a59a;    --ink-3: #72726a;
-      --rule: #2d2d29;
-      --accent: #ff5b2e;  --accent-ink: #180702;
-    }
+  --accent:       var(--c-blue);
+  --accent-hover: color-mix(in oklab, var(--accent) 86%, #000);
+  --on-accent:    #fefefe;
+  --focus:        var(--c-blue-m);
 
-    /* ============================================
-       RESET
-       ============================================ */
-    *, *::before, *::after { box-sizing: border-box; }
-    * { margin: 0; }
-    html { -webkit-text-size-adjust: 100%; }
+  --status-progress-bg: var(--c-blue-l);
+  --status-progress-fg: var(--c-blue);
+  --status-priority-bg: var(--c-yellow-l);
+  --status-priority-fg: var(--c-black);
+  --status-danger-fg:   var(--c-red);
 
-    body {
-      font-family: var(--font-body);
-      font-size: clamp(1rem, 0.95rem + 0.25vw, 1.0625rem);
-      line-height: 1.55;
-      color: var(--ink);
-      background: var(--paper);
-      min-height: 100dvh;
-      -webkit-font-smoothing: antialiased;
-      -moz-osx-font-smoothing: grayscale;
-      text-rendering: optimizeLegibility;
-      transition: background-color var(--dur-3) var(--ease-out),
-                  color var(--dur-3) var(--ease-out);
-    }
+  --r-sm: 8px;
+  --r-md: 14px;
+  --r-lg: 22px;
+  --r-pill: 999px;
 
-    img, svg { display: block; max-width: 100%; }
-    button, input, textarea, select { font: inherit; color: inherit; }
-    button { cursor: pointer; background: none; border: 0; padding: 0; }
-    a { color: inherit; text-decoration: none; }
-    ul, ol { list-style: none; padding: 0; }
-    h1, h2, h3, h4 {
-      font-weight: 700;
-      line-height: 1.05;
-      letter-spacing: -0.02em;
-      text-wrap: balance;
-    }
-    p { text-wrap: pretty; }
+  --s-1: 0.25rem;
+  --s-2: 0.5rem;
+  --s-3: 0.75rem;
+  --s-4: 1rem;
+  --s-5: 1.5rem;
+  --s-6: 2rem;
+  --s-7: 3rem;
 
-    :focus-visible {
-      outline: 2px solid var(--accent);
-      outline-offset: 3px;
-      border-radius: var(--r-xs);
-    }
+  --dur-fast: 140ms;
+  --dur: 220ms;
+  --dur-slow: 340ms;
+  --ease: cubic-bezier(0.2, 0, 0, 1);
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
 
-    /* ============================================
-       SKIP LINK
-       ============================================ */
-    .skip {
-      position: absolute;
-      left: var(--s4);
-      top: -100px;
-      z-index: 200;
-      padding: var(--s2) var(--s4);
-      background: var(--ink);
-      color: var(--paper);
-      border-radius: var(--r-sm);
-      font-size: 0.875rem;
-      font-weight: 500;
-      transition: top var(--dur-2) var(--ease-out);
-    }
-    .skip:focus { top: var(--s4); }
+  --shadow-sm: 0 1px 2px color-mix(in oklab, var(--c-black) 8%, transparent);
+  --shadow-md: 0 8px 24px color-mix(in oklab, var(--c-black) 12%, transparent);
+  --shadow-lg: 0 24px 64px color-mix(in oklab, var(--c-black) 24%, transparent);
+}
 
-    /* ============================================
-       GRAIN
-       ============================================ */
-    .grain {
-      position: fixed;
-      inset: 0;
-      z-index: 100;
-      pointer-events: none;
-      opacity: 0.045;
-      mix-blend-mode: multiply;
-      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.9'/%3E%3C/svg%3E");
-    }
-    [data-theme="dark"] .grain {
-      mix-blend-mode: screen;
-      opacity: 0.06;
-    }
+:root[data-theme="dark"] {
+  color-scheme: dark;
 
-    /* ============================================
-       HEADER
-       ============================================ */
-    .header {
-      position: sticky;
-      top: 0;
-      z-index: 50;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: var(--s4);
-      padding: var(--s3) var(--gutter);
-      background: color-mix(in oklch, var(--paper) 82%, transparent);
-      backdrop-filter: blur(12px) saturate(1.4);
-      -webkit-backdrop-filter: blur(12px) saturate(1.4);
-      border-bottom: 1px solid var(--rule);
-      height: 64px;
-    }
+  --surface:        #17181a;
+  --surface-raised: #1e2023;
+  --surface-sunken: #101113;
 
-    .wordmark {
-      display: inline-flex;
-      align-items: center;
-      gap: var(--s2);
-      font-family: var(--font-display);
-      font-weight: 800;
-      font-size: 1rem;
-      letter-spacing: -0.02em;
-      font-variation-settings: "opsz" 24;
-    }
-    .wordmark__dot {
-      width: 10px;
-      height: 10px;
-      background: var(--accent);
-      border-radius: 50%;
-      display: inline-block;
-      animation: pulse-dot 3s var(--ease-in-out) infinite;
-    }
-    @keyframes pulse-dot {
-      0%, 100% { transform: scale(1); opacity: 1; }
-      50% { transform: scale(0.7); opacity: 0.6; }
-    }
+  --text:       #e8eaed;
+  --text-soft:  color-mix(in oklab, #e8eaed 74%, var(--surface));
+  --text-faint: color-mix(in oklab, #e8eaed 52%, var(--surface));
 
-    .theme-toggle {
-      display: inline-flex;
-      align-items: center;
-      gap: var(--s2);
-      padding: var(--s2) var(--s3);
-      border-radius: 999px;
-      border: 1px solid var(--rule);
-      font-size: 0.8125rem;
-      font-weight: 500;
-      color: var(--ink-2);
-      transition: border-color var(--dur-2) var(--ease-out),
-                  color var(--dur-2) var(--ease-out),
-                  background-color var(--dur-2) var(--ease-out);
-    }
-    .theme-toggle:hover {
-      border-color: var(--ink);
-      color: var(--ink);
-      background: var(--paper-2);
-    }
-    .theme-toggle:active { transform: scale(0.97); }
-    .theme-toggle i { font-size: 1rem; }
+  --line:        color-mix(in oklab, #e8eaed 14%, transparent);
+  --line-strong: color-mix(in oklab, #e8eaed 26%, transparent);
 
-    /* ============================================
-       MAIN LAYOUT
-       ============================================ */
-    .main {
-      max-width: var(--max-w);
-      margin-inline: auto;
-      padding: clamp(var(--s6), 8vw, var(--s9)) var(--gutter) var(--s8);
-    }
+  --accent:       var(--c-blue-m);
+  --accent-hover: color-mix(in oklab, var(--accent) 88%, #fff);
+  --on-accent:    #101114;
+  --focus:        #a8c7fa;
 
-    /* ============================================
-       HERO
-       ============================================ */
-    .hero { margin-bottom: clamp(var(--s7), 10vw, var(--s9)); }
+  --status-progress-bg: color-mix(in oklab, var(--c-blue-m) 22%, var(--surface));
+  --status-progress-fg: #a8c7fa;
+  --status-priority-bg: color-mix(in oklab, var(--c-yellow) 20%, var(--surface));
+  --status-priority-fg: var(--c-yellow);
+  --status-danger-fg:   #f28b82;
 
-    .hero__title {
-      font-family: var(--font-display);
-      font-size: clamp(3rem, 11vw, 8.5rem);
-      font-weight: 800;
-      line-height: 0.9;
-      letter-spacing: -0.045em;
-      margin-bottom: var(--s5);
-      font-variation-settings: "opsz" 96;
-    }
-    .hero__line { display: block; }
-    .hero__line--accent {
-      color: var(--accent);
-      position: relative;
-      display: inline-block;
-    }
-    .hero__line--accent::after {
-      content: '';
-      position: absolute;
-      left: 0;
-      bottom: 0.06em;
-      width: 100%;
-      height: 0.08em;
-      background: var(--accent);
-      transform: scaleX(0);
-      transform-origin: left;
-      animation: line-grow 900ms 400ms var(--ease-out) forwards;
-    }
-    @keyframes line-grow { to { transform: scaleX(1); } }
+  --shadow-sm: 0 1px 2px color-mix(in oklab, #000 50%, transparent);
+  --shadow-md: 0 8px 28px color-mix(in oklab, #000 60%, transparent);
+  --shadow-lg: 0 24px 64px color-mix(in oklab, #000 70%, transparent);
+}
 
-    .hero__lede {
-      font-size: clamp(1.0625rem, 0.95rem + 0.5vw, 1.25rem);
-      color: var(--ink-2);
-      max-width: 42ch;
-      margin-bottom: var(--s6);
-      line-height: 1.5;
-    }
+/* =========================================================================
+   BASE
+   ========================================================================= */
+*, *::before, *::after { box-sizing: border-box; }
 
-    .hero__actions {
-      display: flex;
-      flex-wrap: wrap;
-      gap: var(--s3);
-      align-items: center;
-    }
+html { -webkit-text-size-adjust: 100%; }
 
-    /* ============================================
-       BUTTONS
-       ============================================ */
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: var(--s2);
-      font-family: var(--font-body);
-      font-size: 0.9375rem;
-      font-weight: 500;
-      line-height: 1;
-      padding: 0.875rem 1.25rem;
-      border-radius: var(--r);
-      border: 1.5px solid transparent;
-      white-space: nowrap;
-      transition: background-color var(--dur-2) var(--ease-out),
-                  color var(--dur-2) var(--ease-out),
-                  border-color var(--dur-2) var(--ease-out),
-                  transform var(--dur-1) var(--ease-out),
-                  box-shadow var(--dur-2) var(--ease-out);
-      position: relative;
-    }
-    .btn i { font-size: 1.125em; }
-    .btn:active { transform: translateY(1px) scale(0.99); }
+body {
+  margin: 0;
+  min-height: 100dvh;
+  background: var(--surface);
+  color: var(--text);
+  font-family: "Google Sans", "Google Sans Text", ui-sans-serif, system-ui, sans-serif;
+  font-optical-sizing: auto;
+  font-size: 1rem;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
 
-    .btn--primary {
-      background: var(--accent);
-      color: var(--accent-ink);
-      border-color: var(--accent);
-      box-shadow: 0 1px 0 color-mix(in oklch, var(--accent) 40%, black);
-    }
-    .btn--primary:hover {
-      background: color-mix(in oklch, var(--accent) 88%, black);
-      border-color: color-mix(in oklch, var(--accent) 88%, black);
-      transform: translateY(-2px);
-      box-shadow: 0 6px 20px -6px color-mix(in oklch, var(--accent) 60%, transparent);
-    }
-    .btn--primary:active {
-      transform: translateY(0);
-      box-shadow: 0 1px 0 color-mix(in oklch, var(--accent) 40%, black);
-    }
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0 0 auto 0;
+  height: 40vh;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(52rem 20rem at 50% -10rem,
+      color-mix(in oklab, var(--accent) 16%, transparent),
+      transparent 72%);
+}
 
-    .btn--ghost {
-      background: transparent;
-      color: var(--ink);
-      border-color: var(--rule);
-    }
-    .btn--ghost:hover {
-      border-color: var(--ink);
-      background: var(--paper-2);
-    }
+h1, h2, h3 { text-wrap: balance; }
 
-    /* ============================================
-       FORM (with @starting-style + allow-discrete)
-       ============================================ */
-    .form {
-      display: none;
-      opacity: 0;
-      transform: translateY(-8px);
-      transition: display var(--dur-2) allow-discrete,
-                  opacity var(--dur-2) var(--ease-out),
-                  transform var(--dur-2) var(--ease-out);
-    }
-    .form[data-open="true"] {
-      display: grid;
-      gap: var(--s5);
-      opacity: 1;
-      transform: translateY(0);
-      padding: clamp(var(--s5), 4vw, var(--s6));
-      border: 1.5px solid var(--ink);
-      border-radius: var(--r-lg);
-      margin-bottom: clamp(var(--s6), 8vw, var(--s8));
-      background: var(--paper-2);
-      @starting-style {
-        opacity: 0;
-        transform: translateY(-8px);
-      }
-    }
+:where(a, button, input, textarea, select, [tabindex]):focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
 
-    .form__header {
-      display: flex;
-      align-items: baseline;
-      justify-content: space-between;
-      gap: var(--s3);
-      flex-wrap: wrap;
-    }
-    .form__title {
-      font-family: var(--font-display);
-      font-size: clamp(1.25rem, 1.1rem + 0.5vw, 1.5rem);
-      font-weight: 700;
-      letter-spacing: -0.02em;
-    }
-    .form__meta {
-      font-family: var(--font-mono);
-      font-size: 0.75rem;
-      color: var(--ink-3);
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-    }
+.sr-only {
+  position: absolute;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
 
-    .form__grid { display: grid; gap: var(--s5); }
-    .form__row {
-      display: grid;
-      gap: var(--s4);
-      grid-template-columns: 1fr;
-    }
-    @media (min-width: 640px) {
-      .form__row { grid-template-columns: 1fr 1fr; }
-    }
+.skip-link {
+  position: fixed;
+  top: var(--s-4);
+  left: var(--s-4);
+  z-index: 100;
+  padding: var(--s-2) var(--s-4);
+  border-radius: var(--r-pill);
+  background: var(--accent);
+  color: var(--on-accent);
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-decoration: none;
+  transform: translateY(-220%);
+  transition: transform var(--dur) var(--ease-out);
+}
+.skip-link:focus-visible { transform: translateY(0); }
 
-    .field { position: relative; display: grid; gap: var(--s2); }
-    .field__label {
-      font-family: var(--font-mono);
-      font-size: 0.75rem;
-      font-weight: 500;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-      color: var(--ink-2);
-      display: flex;
-      align-items: center;
-      gap: var(--s2);
-    }
-    .field__label .req { color: var(--accent); }
+/* =========================================================================
+   TOPBAR
+   ========================================================================= */
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  background: color-mix(in oklab, var(--surface) 82%, transparent);
+  backdrop-filter: blur(16px) saturate(1.7);
+  -webkit-backdrop-filter: blur(16px) saturate(1.7);
+  border-bottom: 1px solid var(--line);
+}
 
-    .field__control { position: relative; }
-    .field__input {
-      width: 100%;
-      background: transparent;
-      border: 0;
-      border-bottom: 1.5px solid var(--rule);
-      border-radius: 0;
-      padding: var(--s2) 0;
-      font-size: 1rem;
-      color: var(--ink);
-      transition: border-color var(--dur-2) var(--ease-out);
-    }
-    .field__input::placeholder { color: var(--ink-3); }
-    .field__input:focus {
-      outline: none;
-      border-bottom-color: transparent;
-    }
-    .field__input:focus::placeholder { color: transparent; }
+.topbar__inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s-4);
+  width: min(100% - 2rem, 46rem);
+  min-height: 64px;
+  margin-inline: auto;
+}
 
-    .field__control::after {
-      content: '';
-      position: absolute;
-      left: 50%;
-      right: 50%;
-      bottom: 0;
-      height: 2px;
-      background: var(--accent);
-      transition: left var(--dur-3) var(--ease-out),
-                  right var(--dur-3) var(--ease-out);
-      pointer-events: none;
-    }
-    .field__control:focus-within::after {
-      left: 0;
-      right: 0;
-    }
+.brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1.2;
+}
 
-    .field__error {
-      font-size: 0.8125rem;
-      color: var(--accent);
-      min-height: 1.2em;
-      font-weight: 500;
-    }
+.brand__mark {
+  width: 0.65rem;
+  height: 0.65rem;
+  flex: 0 0 auto;
+  border-radius: 50%;
+  background: conic-gradient(
+    from 215deg,
+    var(--c-blue),
+    var(--c-red-m),
+    var(--c-yellow),
+    var(--c-green-m),
+    var(--c-blue)
+  );
+}
 
-    textarea.field__input {
-      resize: vertical;
-      min-height: 4.5rem;
-      max-height: 14rem;
-      line-height: 1.5;
-      field-sizing: content;
-      overflow-y: auto;
-    }
+/* =========================================================================
+   SHELL
+   ========================================================================= */
+.shell {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  gap: var(--s-5);
+  width: min(100% - 2rem, 46rem);
+  margin-inline: auto;
+  padding-block: var(--s-6) var(--s-7);
+}
 
-    .form__actions {
-      display: flex;
-      flex-wrap: wrap;
-      gap: var(--s3);
-      justify-content: flex-end;
-      padding-top: var(--s2);
-      border-top: 1px dashed var(--rule);
-    }
+/* =========================================================================
+   COMPOSE
+   ========================================================================= */
+.compose {
+  display: grid;
+  gap: var(--s-4);
+  padding: var(--s-5);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background: var(--surface-raised);
+  box-shadow: var(--shadow-sm);
+}
 
-    /* ============================================
-       LIST
-       ============================================ */
-    .list { display: grid; gap: var(--s4); }
-    .list__head {
-      display: flex;
-      align-items: baseline;
-      justify-content: space-between;
-      gap: var(--s3);
-      padding-bottom: var(--s3);
-      border-bottom: 1.5px solid var(--ink);
-      margin-bottom: var(--s2);
-    }
-    .list__heading {
-      font-family: var(--font-display);
-      font-size: clamp(1.5rem, 1.2rem + 1vw, 2rem);
-      font-weight: 700;
-      letter-spacing: -0.025em;
-    }
-    .list__count {
-      font-family: var(--font-mono);
-      font-size: 0.8125rem;
-      color: var(--ink-2);
-      letter-spacing: 0.02em;
-    }
-    .list__items { display: grid; gap: var(--s4); }
+.compose__summary {
+  margin: 0;
+  font-size: 1.125rem;
+  font-weight: 600;
+  letter-spacing: -0.015em;
+  color: var(--text);
+}
 
-    /* ============================================
-       TODO CARD
-       ============================================ */
-    .todo {
-      position: relative;
-      display: grid;
-      gap: var(--s3);
-      padding: clamp(var(--s4), 3vw, var(--s5));
-      border: 1.5px solid var(--rule);
-      border-radius: var(--r);
-      background: var(--paper);
-      transition: border-color var(--dur-2) var(--ease-out),
-                  background-color var(--dur-2) var(--ease-out),
-                  transform var(--dur-2) var(--ease-out),
-                  box-shadow var(--dur-2) var(--ease-out);
-    }
-    .todo:hover {
-      border-color: var(--ink);
-      background: var(--paper-2);
-      transform: translateY(-2px);
-      box-shadow: 0 8px 24px -12px color-mix(in oklch, var(--ink) 30%, transparent);
-    }
+.compose__hint {
+  margin: 0;
+  font-size: 0.9375rem;
+  color: var(--text-soft);
+  max-width: 46ch;
+}
 
-    .todo--priority {
-      border-color: var(--accent);
-      background: color-mix(in oklch, var(--accent) 4%, var(--paper));
-    }
-    .todo--priority:hover {
-      border-color: var(--accent);
-      background: color-mix(in oklch, var(--accent) 8%, var(--paper));
-    }
+/* =========================================================================
+   BUTTONS
+   ========================================================================= */
+.btn {
+  --btn-bg: transparent;
+  --btn-fg: var(--text);
+  --btn-border: transparent;
 
-    .todo--progress {
-      border-style: dashed;
-      border-color: var(--ink-2);
-    }
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  min-height: 2.75rem;
+  padding-inline: var(--s-5);
+  border: 1px solid var(--btn-border);
+  border-radius: var(--r-pill);
+  background: var(--btn-bg);
+  color: var(--btn-fg);
+  font: inherit;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background-color var(--dur) var(--ease),
+    border-color var(--dur) var(--ease),
+    color var(--dur) var(--ease),
+    box-shadow var(--dur) var(--ease),
+    transform var(--dur-fast) var(--ease);
+}
 
-    .todo--overdue {
-      border-color: var(--accent);
-      background: color-mix(in oklch, var(--accent) 6%, var(--paper));
-    }
+.btn:active:not(:disabled) {
+  transform: translateY(1px) scale(0.985);
+}
 
-    .todo__meta {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: var(--s3);
-      flex-wrap: wrap;
-    }
-    .todo__tags {
-      display: flex;
-      gap: var(--s2);
-      flex-wrap: wrap;
-    }
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
 
-    .tag {
-      display: inline-flex;
-      align-items: center;
-      gap: var(--s1);
-      font-family: var(--font-mono);
-      font-size: 0.6875rem;
-      font-weight: 500;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      padding: 0.25rem 0.5rem;
-      border-radius: var(--r-xs);
-      border: 1px solid var(--rule);
-      color: var(--ink-2);
-      line-height: 1;
-    }
-    .tag--priority {
-      background: var(--accent);
-      border-color: var(--accent);
-      color: var(--accent-ink);
-    }
-    .tag--progress {
-      background: var(--ink);
-      border-color: var(--ink);
-      color: var(--paper);
-    }
-    .tag i { font-size: 0.75rem; }
+.btn--primary {
+  --btn-bg: var(--accent);
+  --btn-fg: var(--on-accent);
+  --btn-border: transparent;
+  box-shadow: var(--shadow-sm);
+}
+.btn--primary:hover { --btn-bg: var(--accent-hover); }
 
-    .todo__index {
-      font-family: var(--font-mono);
-      font-size: 0.75rem;
-      color: var(--ink-3);
-      letter-spacing: 0.04em;
-    }
+.btn--ghost {
+  --btn-bg: transparent;
+  --btn-fg: var(--text-soft);
+  --btn-border: var(--line-strong);
+}
+.btn--ghost:hover {
+  --btn-bg: var(--surface-sunken);
+  --btn-fg: var(--text);
+  --btn-border: var(--line-strong);
+}
 
-    .todo__title {
-      font-family: var(--font-display);
-      font-size: clamp(1.25rem, 1.1rem + 0.4vw, 1.5rem);
-      font-weight: 700;
-      letter-spacing: -0.02em;
-      line-height: 1.2;
-      word-break: break-word;
-    }
-    .todo--priority .todo__title { color: var(--accent); }
+.btn--quiet {
+  --btn-bg: transparent;
+  --btn-fg: var(--text-soft);
+  --btn-border: var(--line);
+}
+.btn--quiet:hover {
+  --btn-bg: var(--surface-sunken);
+  --btn-fg: var(--text);
+  --btn-border: var(--line-strong);
+}
 
-    .todo__detail {
-      color: var(--ink-2);
-      font-size: 0.9375rem;
-      line-height: 1.6;
-      white-space: pre-wrap;
-      word-break: break-word;
-    }
+.btn--quiet.is-active {
+  --btn-bg: var(--status-progress-bg);
+  --btn-fg: var(--status-progress-fg);
+  --btn-border: transparent;
+}
 
-    .todo__link {
-      display: inline-flex;
-      align-items: center;
-      gap: var(--s2);
-      font-size: 0.875rem;
-      color: var(--accent);
-      font-weight: 500;
-      max-width: 100%;
-      word-break: break-all;
-      border-bottom: 1px solid transparent;
-      transition: border-color var(--dur-2) var(--ease-out);
-      align-self: start;
-    }
-    .todo__link:hover { border-bottom-color: currentColor; }
-    .todo__link i { flex-shrink: 0; }
+.btn--sm {
+  min-height: 2.25rem;
+  padding-inline: var(--s-4);
+  font-size: 0.875rem;
+}
 
-    .todo__deadline {
-      display: inline-flex;
-      align-items: center;
-      gap: var(--s2);
-      font-family: var(--font-mono);
-      font-size: 0.8125rem;
-      color: var(--ink-2);
-      padding: var(--s2) var(--s3);
-      border-radius: var(--r-sm);
-      background: var(--paper-3);
-      align-self: start;
-      font-variant-numeric: tabular-nums;
-    }
-    .todo__deadline i { font-size: 0.875rem; }
-    .todo__deadline[data-overdue="true"] {
-      background: color-mix(in oklch, var(--accent) 12%, var(--paper));
-      color: var(--accent);
-    }
+.btn--block {
+  width: 100%;
+  min-height: 3rem;
+}
 
-    .todo__actions {
-      display: flex;
-      flex-wrap: wrap;
-      gap: var(--s2);
-      padding-top: var(--s3);
-      border-top: 1px dashed var(--rule);
-      margin-top: var(--s1);
-    }
+.btn__plus {
+  font-size: 1.125rem;
+  line-height: 1;
+  font-weight: 500;
+}
 
-    .action {
-      display: inline-flex;
-      align-items: center;
-      gap: var(--s1);
-      padding: 0.5rem 0.75rem;
-      font-size: 0.8125rem;
-      font-weight: 500;
-      border-radius: var(--r-sm);
-      border: 1px solid var(--rule);
-      background: var(--paper);
-      color: var(--ink-2);
-      transition: border-color var(--dur-2) var(--ease-out),
-                  background-color var(--dur-2) var(--ease-out),
-                  color var(--dur-2) var(--ease-out),
-                  transform var(--dur-1) var(--ease-out);
-    }
-    .action i { font-size: 0.9375rem; }
-    .action:hover {
-      border-color: var(--ink);
-      color: var(--ink);
-      background: var(--paper-2);
-    }
-    .action:active { transform: scale(0.97); }
-    .action--danger:hover {
-      border-color: var(--accent);
-      color: var(--accent);
-      background: color-mix(in oklch, var(--accent) 8%, var(--paper));
-    }
-    .action[aria-pressed="true"] {
-      background: var(--accent);
-      color: var(--accent-ink);
-      border-color: var(--accent);
-    }
-    .action[aria-pressed="true"]:hover {
-      background: color-mix(in oklch, var(--accent) 88%, black);
-      color: var(--accent-ink);
-      border-color: color-mix(in oklch, var(--accent) 88%, black);
-    }
+/* =========================================================================
+   FORM
+   ========================================================================= */
+.form {
+  display: grid;
+  gap: var(--s-4);
+  padding: var(--s-5);
+  border: 1px solid var(--line);
+  border-radius: var(--r-lg);
+  background: var(--surface-raised);
+  box-shadow: var(--shadow-sm);
+  opacity: 1;
+  transform: translateY(0);
+  transition:
+    opacity var(--dur) var(--ease-out),
+    transform var(--dur) var(--ease-out),
+    display var(--dur) allow-discrete;
+}
 
-    /* ============================================
-       EMPTY STATE
-       ============================================ */
-    .empty {
-      display: grid;
-      gap: var(--s3);
-      padding: clamp(var(--s6), 8vw, var(--s8)) var(--s5);
-      text-align: center;
-      border: 1.5px dashed var(--rule);
-      border-radius: var(--r-lg);
-      color: var(--ink-2);
-    }
-    .empty__icon {
-      font-size: 2.5rem;
-      color: var(--ink-3);
-      margin-inline: auto;
-      animation: float-icon 4s var(--ease-in-out) infinite;
-    }
-    @keyframes float-icon {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-6px); }
-    }
-    .empty__title {
-      font-family: var(--font-display);
-      font-size: 1.25rem;
-      font-weight: 700;
-      color: var(--ink);
-      letter-spacing: -0.02em;
-    }
-    .empty__text {
-      font-size: 0.9375rem;
-      max-width: 36ch;
-      margin-inline: auto;
-    }
+.form[hidden] {
+  display: none;
+  opacity: 0;
+  transform: translateY(-8px);
+}
 
-    /* ============================================
-       DONE STRIKETHROUGH
-       ============================================ */
-    .todo--done .todo__title {
-      position: relative;
-      display: inline-block;
-      color: var(--ink-3);
-    }
-    .todo--done .todo__title::after {
-      content: '';
-      position: absolute;
-      left: 0;
-      top: 55%;
-      height: 2px;
-      width: 0;
-      background: var(--accent);
-      animation: strike-through 400ms var(--ease-out) forwards;
-    }
-    @keyframes strike-through { to { width: 100%; } }
+@starting-style {
+  .form {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+}
 
-    /* ============================================
-       FOOTER
-       ============================================ */
-    .footer {
-      max-width: var(--max-w);
-      margin-inline: auto;
-      padding: var(--s6) var(--gutter) var(--s7);
-      border-top: 1px solid var(--rule);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: var(--s4);
-      flex-wrap: wrap;
-      font-family: var(--font-mono);
-      font-size: 0.75rem;
-      color: var(--ink-3);
-      letter-spacing: 0.04em;
-      text-transform: uppercase;
-    }
+.form__title {
+  margin: 0;
+  font-size: 1.0625rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
 
-    /* ============================================
-       SR-ONLY
-       ============================================ */
-    .sr-only {
-      position: absolute;
-      width: 1px;
-      height: 1px;
-      padding: 0;
-      margin: -1px;
-      overflow: hidden;
-      clip: rect(0, 0, 0, 0);
-      white-space: nowrap;
-      border: 0;
-    }
+.form__grid {
+  display: grid;
+  gap: var(--s-4);
+  grid-template-columns: 1fr;
+}
 
-    /* ============================================
-       ENTRY SEQUENCE
-       ============================================ */
-    @media (prefers-reduced-motion: no-preference) {
-      .hero__title,
-      .hero__lede,
-      .hero__actions,
-      .list {
-        animation: fade-up 700ms var(--ease-out) both;
-      }
-      .hero__lede { animation-delay: 150ms; }
-      .hero__actions { animation-delay: 300ms; }
-      .list { animation-delay: 450ms; }
+.form__actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--s-2);
+  padding-top: var(--s-1);
+}
 
-      @keyframes fade-up {
-        from { opacity: 0; transform: translateY(12px); }
-        to { opacity: 1; transform: translateY(0); }
-      }
-    }
+.field {
+  display: grid;
+  gap: 0.4rem;
+  min-width: 0;
+}
 
-    /* ============================================
-       REDUCED MOTION
-       ============================================ */
-    @media (prefers-reduced-motion: reduce) {
-      *, *::before, *::after {
-        animation-duration: 0.01ms !important;
-        animation-iteration-count: 1 !important;
-        transition-duration: 0.01ms !important;
-        scroll-behavior: auto !important;
-      }
-      .grain { display: none; }
-      .hero__line--accent::after { transform: scaleX(1); }
-      .wordmark__dot, .empty__icon { animation: none; }
-    }
+.field__label {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  color: var(--text-soft);
+}
 
-    /* ============================================
-       MOBILE
-       ============================================ */
-    @media (max-width: 480px) {
-      .header { height: 56px; }
-      .theme-toggle__label { display: none; }
-      .form__actions { flex-direction: column-reverse; }
-      .form__actions .btn { width: 100%; }
-      .todo__actions { gap: var(--s1); }
-      .action span { display: none; }
-      .action { padding: 0.5rem; }
-      .action i { font-size: 1rem; }
-      .footer { flex-direction: column; align-items: flex-start; }
-    }
-  </style>
+.field__input {
+  width: 100%;
+  min-height: 2.75rem;
+  padding: 0.6rem 0.85rem;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-sm);
+  background: var(--surface);
+  color: var(--text);
+  font: inherit;
+  font-size: 0.9375rem;
+  transition:
+    border-color var(--dur) var(--ease),
+    background-color var(--dur) var(--ease);
+}
+
+.field__input::placeholder { color: var(--text-faint); }
+
+.field__input:hover {
+  border-color: color-mix(in oklab, var(--accent) 42%, var(--line-strong));
+}
+
+.field__input:focus {
+  border-color: var(--accent);
+  background: color-mix(in oklab, var(--accent) 6%, var(--surface-raised));
+}
+
+.field__input--area {
+  min-height: 7rem;
+  resize: vertical;
+  line-height: 1.5;
+}
+
+.field__error {
+  margin: 0;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--status-danger-fg);
+}
+.field__error[hidden] { display: none; }
+
+.field--invalid .field__input {
+  border-color: var(--status-danger-fg);
+}
+
+/* =========================================================================
+   LIST
+   ========================================================================= */
+.list {
+  display: grid;
+  gap: var(--s-3);
+}
+
+.list__title {
+  margin: 0;
+  font-size: 0.9375rem;
+  font-weight: 600;
+  color: var(--text-soft);
+}
+
+.todo-list {
+  display: grid;
+  gap: var(--s-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+.todo-list[hidden] { display: none; }
+
+.todo {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: var(--r-md);
+  background: var(--surface-raised);
+  transition:
+    border-color var(--dur) var(--ease),
+    box-shadow var(--dur) var(--ease),
+    transform var(--dur) var(--ease-out);
+}
+
+.todo::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 3px;
+  background: transparent;
+  transition: background-color var(--dur) var(--ease);
+}
+
+.todo--priority::before { background: var(--c-orange); }
+.todo--progress::before { background: var(--c-blue-m); }
+
+@media (hover: hover) and (pointer: fine) {
+  .todo:hover {
+    transform: translateY(-2px);
+    border-color: color-mix(in oklab, var(--accent) 36%, var(--line));
+    box-shadow: var(--shadow-md);
+  }
+}
+
+.todo__body {
+  display: grid;
+  gap: var(--s-3);
+  padding: var(--s-4) var(--s-4) var(--s-4) calc(var(--s-4) + 3px);
+}
+
+.todo--new .todo__body {
+  animation: todo-in var(--dur-slow) var(--ease-out) backwards;
+}
+
+@keyframes todo-in {
+  from { opacity: 0; transform: translateY(10px) scale(0.99); }
+  to   { opacity: 1; transform: none; }
+}
+
+.todo__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: var(--s-2);
+}
+
+.todo__title {
+  flex: 1 1 12rem;
+  min-width: 0;
+  margin: 0;
+  font-size: 1.0625rem;
+  font-weight: 600;
+  line-height: 1.35;
+  letter-spacing: -0.01em;
+  overflow-wrap: anywhere;
+}
+
+.todo__detail {
+  margin: 0;
+  max-width: 65ch;
+  font-size: 0.9375rem;
+  color: var(--text-soft);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.todo__link {
+  justify-self: start;
+  max-width: 100%;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--accent);
+  text-decoration: none;
+  overflow-wrap: anywhere;
+  background-image: linear-gradient(var(--accent), var(--accent));
+  background-repeat: no-repeat;
+  background-position: 0 100%;
+  background-size: 0% 1.5px;
+  transition: background-size var(--dur) var(--ease);
+}
+.todo__link::after {
+  content: "\2197";
+  font-size: 0.9em;
+  margin-left: 0.15em;
+}
+.todo__link:hover { background-size: 100% 1.5px; }
+
+.todo__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-2) var(--s-5);
+  margin: 0;
+  padding-top: var(--s-3);
+  border-top: 1px solid var(--line);
+  font-size: 0.8125rem;
+}
+
+.todo__meta > div {
+  display: grid;
+  gap: 0.1rem;
+  min-width: 0;
+}
+
+.todo__meta dt {
+  font-weight: 500;
+  color: var(--text-faint);
+}
+
+.todo__meta dd {
+  margin: 0;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+
+.todo__countdown[data-overdue="true"] { color: var(--status-danger-fg); }
+
+.todo__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-2);
+  padding-top: var(--s-1);
+}
+
+.todo__actions .btn {
+  min-height: 2.25rem;
+  padding-inline: var(--s-4);
+  font-size: 0.8125rem;
+}
+
+.chip {
+  flex: 0 0 auto;
+  display: inline-flex;
+  align-items: center;
+  padding: 0.15rem 0.55rem;
+  border-radius: var(--r-pill);
+  font-size: 0.6875rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.chip--priority {
+  background: var(--status-priority-bg);
+  color: var(--status-priority-fg);
+}
+
+.chip--progress {
+  background: var(--status-progress-bg);
+  color: var(--status-progress-fg);
+}
+
+/* =========================================================================
+   EMPTY STATE
+   ========================================================================= */
+.empty {
+  display: grid;
+  gap: var(--s-2);
+  padding: var(--s-6) var(--s-5);
+  border: 1px dashed var(--line-strong);
+  border-radius: var(--r-md);
+  text-align: center;
+}
+.empty[hidden] { display: none; }
+
+.empty__title {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.empty__body {
+  margin: 0;
+  font-size: 0.9375rem;
+  color: var(--text-soft);
+  text-wrap: pretty;
+}
+
+/* =========================================================================
+   DIALOG
+   ========================================================================= */
+.dialog {
+  width: min(24rem, calc(100vw - 2rem));
+  padding: var(--s-5);
+  border: none;
+  border-radius: var(--r-lg);
+  background: var(--surface-raised);
+  color: var(--text);
+  box-shadow: var(--shadow-lg);
+  opacity: 0;
+  transform: translateY(12px) scale(0.97);
+  transition:
+    opacity var(--dur) var(--ease-out),
+    transform var(--dur) var(--ease-out),
+    display var(--dur) allow-discrete,
+    overlay var(--dur) allow-discrete;
+}
+
+.dialog[open] {
+  opacity: 1;
+  transform: none;
+}
+
+@starting-style {
+  .dialog[open] {
+    opacity: 0;
+    transform: translateY(12px) scale(0.97);
+  }
+}
+
+.dialog::backdrop {
+  background: color-mix(in oklab, var(--c-black) 50%, transparent);
+  backdrop-filter: blur(2px);
+  -webkit-backdrop-filter: blur(2px);
+  opacity: 0;
+  transition:
+    opacity var(--dur) var(--ease-out),
+    display var(--dur) allow-discrete,
+    overlay var(--dur) allow-discrete;
+}
+
+.dialog[open]::backdrop { opacity: 1; }
+
+@starting-style {
+  .dialog[open]::backdrop { opacity: 0; }
+}
+
+.dialog__title {
+  margin: 0 0 var(--s-2);
+  font-size: 1.0625rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+.dialog__body {
+  margin: 0 0 var(--s-5);
+  font-size: 0.9375rem;
+  color: var(--text-soft);
+  overflow-wrap: anywhere;
+}
+
+.dialog__actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: var(--s-2);
+}
+
+/* =========================================================================
+   RESPONSIVE
+   ========================================================================= */
+@media (min-width: 30rem) {
+  .form__grid { grid-template-columns: 1fr 1fr; }
+}
+
+@media (max-width: 29.9375rem) {
+  .form__actions { justify-content: stretch; }
+  .form__actions .btn { flex: 1 1 8rem; }
+  .todo__actions .btn { flex: 1 1 6rem; }
+  .dialog__actions .btn { flex: 1 1 6rem; }
+}
+
+@media (max-width: 24rem) {
+  .topbar__inner { min-height: 56px; }
+  .brand { font-size: 0.9375rem; }
+}
+
+/* =========================================================================
+   REDUCED MOTION
+   ========================================================================= */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+</style>
 </head>
-<body>
-  <a class="skip" href="#main">Langsung ke konten</a>
-  <div class="grain" aria-hidden="true"></div>
 
-  <header class="header">
-    <span class="wordmark">
-      <span class="wordmark__dot" aria-hidden="true"></span>
-      Mau Ngapain?
-    </span>
+<body>
+<a class="skip-link" href="#main">Langsung ke daftar rencana</a>
+
+<header class="topbar">
+  <div class="topbar__inner">
+    <h1 class="brand">
+      <span class="brand__mark" aria-hidden="true"></span>
+      <span>Mau Ngapain?</span>
+    </h1>
+
     <button
-      class="theme-toggle"
-      id="theme-toggle"
+      class="btn btn--ghost btn--sm"
+      id="themeToggle"
       type="button"
-      aria-label="Aktifkan mode gelap"
       aria-pressed="false"
     >
-      <i class="ph ph-moon" id="theme-icon" aria-hidden="true"></i>
-      <span class="theme-toggle__label" id="theme-label">Gelap</span>
+      <span id="themeLabel">Mode gelap</span>
     </button>
-  </header>
+  </div>
+</header>
 
-  <main class="main" id="main">
-    <section class="hero" aria-labelledby="hero-title">
-      <h1 class="hero__title" id="hero-title">
-        <span class="hero__line">Mau</span>
-        <span class="hero__line hero__line--accent">Ngapain?</span>
-      </h1>
-      <p class="hero__lede">
-        Tempat kecil untuk hal-hal yang ingin kamu kerjakan.
-        Catat, atur prioritas, selesaikan.
-      </p>
-      <div class="hero__actions">
-        <button
-          class="btn btn--primary"
-          id="open-form"
-          type="button"
-          aria-expanded="false"
-          aria-controls="todo-form"
-        >
-          <i class="ph-bold ph-plus" aria-hidden="true"></i>
-          <span>Tambah tugas</span>
-        </button>
-      </div>
-    </section>
+<main class="shell" id="main">
 
-    <form
-      class="form"
-      id="todo-form"
-      data-open="false"
-      novalidate
-      aria-labelledby="form-heading"
+  <section class="compose" aria-labelledby="summary">
+    <p class="compose__summary" id="summary" aria-live="polite">Belum ada rencana</p>
+    <p class="compose__hint">Tulis satu hal, beri tenggat, lalu kerjakan. Semua tersimpan di perangkat ini.</p>
+
+    <button
+      class="btn btn--primary btn--block"
+      id="addBtn"
+      type="button"
+      aria-expanded="false"
+      aria-controls="todoForm"
     >
-      <div class="form__header">
-        <h2 class="form__title" id="form-heading">Tugas baru</h2>
-        <span class="form__meta" id="form-meta">Baru</span>
+      <span class="btn__plus" aria-hidden="true">+</span>
+      Tambah rencana
+    </button>
+  </section>
+
+  <form class="form" id="todoForm" hidden novalidate>
+    <h2 class="form__title" id="formTitle">Rencana baru</h2>
+
+    <div class="field" id="judulField">
+      <label class="field__label" for="judul">Judul</label>
+      <input
+        class="field__input"
+        id="judul"
+        name="judul"
+        type="text"
+        autocomplete="off"
+        maxlength="200"
+        aria-describedby="judulError"
+      >
+      <p class="field__error" id="judulError" hidden>Judul tidak boleh kosong.</p>
+    </div>
+
+    <div class="field">
+      <label class="field__label" for="detail">Detail</label>
+      <textarea
+        class="field__input field__input--area"
+        id="detail"
+        name="detail"
+        rows="4"
+        maxlength="4000"
+      ></textarea>
+    </div>
+
+    <div class="field">
+      <label class="field__label" for="referensi">Tautan</label>
+      <input
+        class="field__input"
+        id="referensi"
+        name="referensi"
+        type="url"
+        inputmode="url"
+        autocomplete="off"
+        spellcheck="false"
+        maxlength="500"
+      >
+    </div>
+
+    <div class="form__grid">
+      <div class="field">
+        <label class="field__label" for="deadline">Tenggat</label>
+        <input class="field__input" id="deadline" name="deadline" type="date">
       </div>
 
-      <div class="form__grid">
-        <div class="field">
-          <label class="field__label" for="judul">
-            Judul <span class="req" aria-hidden="true">*</span>
-          </label>
-          <div class="field__control">
-            <input
-              class="field__input"
-              id="judul"
-              name="judul"
-              type="text"
-              required
-              maxlength="120"
-              autocomplete="off"
-              placeholder="Mau ngapain?"
-              aria-describedby="judul-error"
-            />
-          </div>
-          <p class="field__error" id="judul-error" role="alert"></p>
-        </div>
-
-        <div class="field">
-          <label class="field__label" for="detail">Detail</label>
-          <div class="field__control">
-            <textarea
-              class="field__input"
-              id="detail"
-              name="detail"
-              rows="3"
-              placeholder="Catatan tambahan (opsional)"
-            ></textarea>
-          </div>
-        </div>
-
-        <div class="form__row">
-          <div class="field">
-            <label class="field__label" for="referensi">Link</label>
-            <div class="field__control">
-              <input
-                class="field__input"
-                id="referensi"
-                name="referensi"
-                type="url"
-                placeholder="https://..."
-                autocomplete="off"
-                aria-describedby="referensi-error"
-              />
-            </div>
-            <p class="field__error" id="referensi-error" role="alert"></p>
-          </div>
-          <div class="field">
-            <label class="field__label" for="deadline">Tenggat</label>
-            <div class="field__control">
-              <input class="field__input" id="deadline" name="deadline" type="date" />
-            </div>
-          </div>
-        </div>
-
-        <div class="form__row">
-          <div class="field">
-            <label class="field__label" for="time">Jam</label>
-            <div class="field__control">
-              <input class="field__input" id="time" name="time" type="time" />
-            </div>
-          </div>
-        </div>
+      <div class="field">
+        <label class="field__label" for="waktu">Waktu</label>
+        <input class="field__input" id="waktu" name="waktu" type="time">
       </div>
+    </div>
 
-      <div class="form__actions">
-        <button class="btn btn--ghost" type="button" id="cancel-form">Batal</button>
-        <button class="btn btn--primary" type="submit" id="submit-form">
-          <i class="ph-bold ph-check" aria-hidden="true"></i>
-          <span>Simpan</span>
-        </button>
-      </div>
-    </form>
+    <div class="form__actions">
+      <button class="btn btn--ghost" id="cancelBtn" type="button">Batal</button>
+      <button class="btn btn--primary" type="submit">Simpan</button>
+    </div>
+  </form>
 
-    <section class="list" aria-labelledby="list-heading">
-      <div class="list__head">
-        <h2 class="list__heading" id="list-heading">Daftar</h2>
-        <p class="list__count" id="list-count" aria-live="polite">Belum ada tugas</p>
-      </div>
-      <div class="list__items" id="todo-list" role="list"></div>
-      <div class="empty" id="empty" hidden>
-        <i class="ph ph-sparkle empty__icon" aria-hidden="true"></i>
-        <p class="empty__title">Masih kosong</p>
-        <p class="empty__text">
-          Belum ada yang perlu dikerjakan. Tambahkan tugas pertamamu,
-          atau nikmati waktu luang.
-        </p>
-      </div>
-    </section>
-  </main>
+  <section class="list" aria-labelledby="listTitle">
+    <h2 class="list__title" id="listTitle">Daftar rencana</h2>
+    <ul class="todo-list" id="todoList"></ul>
 
-  <footer class="footer">
-    <span>Disimpan lokal di perangkatmu</span>
-    <span id="footer-count">0 tugas</span>
-  </footer>
+    <div class="empty" id="emptyState" hidden>
+      <p class="empty__title">Belum ada rencana</p>
+      <p class="empty__body">Tambahkan satu hal kecil yang mau kamu kerjakan hari ini.</p>
+    </div>
+  </section>
 
-  <script>
-    (() => {
-      'use strict';
+</main>
 
-      /* ============================================
-         CONSTANTS
-         ============================================ */
-      const STORAGE_KEY = 'todos.v2';
-      const THEME_KEY = 'theme';
-      const TICK_MS = 15000; // update countdown setiap 15 detik (cukup untuk resolusi menit)
+<dialog class="dialog" id="confirmDialog" aria-labelledby="confirmTitle">
+  <h2 class="dialog__title" id="confirmTitle">Tandai selesai?</h2>
+  <p class="dialog__body" id="confirmText">Rencana ini akan dihapus dari daftar.</p>
+  <div class="dialog__actions">
+    <button class="btn btn--ghost" type="button" data-dialog="cancel">Batal</button>
+    <button class="btn btn--primary" type="button" data-dialog="confirm">Hapus</button>
+  </div>
+</dialog>
 
-      /* ============================================
-         STATE
-         ============================================ */
-      let todos = [];
-      let editingId = null;
-      let countdownTimer = null;
+<script>
+(function () {
+  'use strict';
 
-      /* ============================================
-         DOM
-         ============================================ */
-      const $ = (sel) => document.querySelector(sel);
-      const $$ = (sel) => Array.from(document.querySelectorAll(sel));
+  var STORAGE_KEY = 'todos';
+  var THEME_KEY = 'theme';
 
-      const form = $('#todo-form');
-      const formMeta = $('#form-meta');
-      const openFormBtn = $('#open-form');
-      const cancelBtn = $('#cancel-form');
-      const listEl = $('#todo-list');
-      const emptyEl = $('#empty');
-      const listCount = $('#list-count');
-      const footerCount = $('#footer-count');
-      const themeBtn = $('#theme-toggle');
-      const themeIcon = $('#theme-icon');
-      const themeLabel = $('#theme-label');
-      const judul = $('#judul');
-      const detail = $('#detail');
-      const referensi = $('#referensi');
-      const deadline = $('#deadline');
-      const time = $('#time');
-      const judulErr = $('#judul-error');
-      const referensiErr = $('#referensi-error');
+  var el = {
+    form: document.getElementById('todoForm'),
+    formTitle: document.getElementById('formTitle'),
+    judulField: document.getElementById('judulField'),
+    judul: document.getElementById('judul'),
+    judulError: document.getElementById('judulError'),
+    detail: document.getElementById('detail'),
+    referensi: document.getElementById('referensi'),
+    deadline: document.getElementById('deadline'),
+    waktu: document.getElementById('waktu'),
+    addBtn: document.getElementById('addBtn'),
+    cancelBtn: document.getElementById('cancelBtn'),
+    list: document.getElementById('todoList'),
+    empty: document.getElementById('emptyState'),
+    summary: document.getElementById('summary'),
+    themeToggle: document.getElementById('themeToggle'),
+    themeLabel: document.getElementById('themeLabel'),
+    dialog: document.getElementById('confirmDialog'),
+    dialogText: document.getElementById('confirmText')
+  };
 
-      /* ============================================
-         STORAGE
-         ============================================ */
-      function loadTodos() {
-        try {
-          const raw = localStorage.getItem(STORAGE_KEY);
-          const parsed = raw ? JSON.parse(raw) : [];
-          if (Array.isArray(parsed)) {
-            todos = parsed.filter(
-              (t) => t && typeof t === 'object' && typeof t.id === 'string'
-            );
-          }
-        } catch (e) {
-          todos = [];
-        }
+  var state = {
+    todos: [],
+    editingId: null,
+    pendingDeleteId: null
+  };
+
+  var dateFmt = new Intl.DateTimeFormat('id-ID', {
+    weekday: 'short', day: 'numeric', month: 'short', year: 'numeric'
+  });
+  var timeFmt = new Intl.DateTimeFormat('id-ID', {
+    hour: '2-digit', minute: '2-digit'
+  });
+
+  /* ---------------- utilities ---------------- */
+
+  function uid() {
+    if (window.crypto && typeof window.crypto.randomUUID === 'function') {
+      return window.crypto.randomUUID();
+    }
+    return 'id-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 8);
+  }
+
+  function prefersReduced() {
+    return window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  }
+
+  function clampText(value, limit) {
+    return String(value == null ? '' : value).slice(0, limit);
+  }
+
+  function normalizeUrl(value) {
+    var raw = clampText(value, 500).trim();
+    if (!raw) return '';
+    var withProto = /^[a-z][a-z0-9+.-]*:/i.test(raw) ? raw : 'https://' + raw;
+    try {
+      var url = new URL(withProto);
+      if (url.protocol !== 'http:' && url.protocol !== 'https:') return '';
+      return url.href;
+    } catch (err) {
+      return '';
+    }
+  }
+
+  function normalize(todo) {
+    return {
+      id: todo && todo.id ? String(todo.id) : uid(),
+      judul: clampText(todo && todo.judul, 200),
+      detail: clampText(todo && todo.detail, 4000),
+      referensi: normalizeUrl(todo && todo.referensi),
+      deadline: clampText(todo && todo.deadline, 10),
+      waktu: clampText(todo && todo.waktu, 5),
+      onProgress: Boolean(todo && todo.onProgress),
+      isPriority: Boolean(todo && todo.isPriority)
+    };
+  }
+
+  function persist() {
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state.todos));
+    } catch (err) {
+      /* storage unavailable, keep working in memory */
+    }
+  }
+
+  function load() {
+    try {
+      var raw = localStorage.getItem(STORAGE_KEY);
+      var parsed = raw ? JSON.parse(raw) : [];
+      state.todos = Array.isArray(parsed) ? parsed.map(normalize) : [];
+    } catch (err) {
+      state.todos = [];
+    }
+  }
+
+  function dueTime(todo) {
+    if (!todo.deadline) return Infinity;
+    var stamp = new Date(todo.deadline + 'T' + (todo.waktu || '00:00')).getTime();
+    return Number.isNaN(stamp) ? Infinity : stamp;
+  }
+
+  function compare(a, b) {
+    if (a.isPriority !== b.isPriority) return a.isPriority ? -1 : 1;
+    if (a.onProgress !== b.onProgress) return a.onProgress ? -1 : 1;
+    return dueTime(a) - dueTime(b);
+  }
+
+  function formatDue(todo) {
+    var stamp = dueTime(todo);
+    if (!Number.isFinite(stamp)) return '';
+    var date = new Date(stamp);
+    return todo.waktu
+      ? dateFmt.format(date) + ' \u00B7 ' + timeFmt.format(date)
+      : dateFmt.format(date);
+  }
+
+  function formatSpan(ms) {
+    var total = Math.max(0, Math.floor(ms / 1000));
+    var days = Math.floor(total / 86400);
+    var hours = Math.floor((total % 86400) / 3600);
+    var minutes = Math.floor((total % 3600) / 60);
+
+    if (days > 0) return days + ' hari ' + hours + ' jam';
+    if (hours > 0) return hours + ' jam ' + minutes + ' mnt';
+    return minutes + ' mnt';
+  }
+
+  /* ---------------- DOM builders ---------------- */
+
+  function chip(text, variant) {
+    var span = document.createElement('span');
+    span.className = 'chip chip--' + variant;
+    span.textContent = text;
+    return span;
+  }
+
+  function metaRow(term, value) {
+    var row = document.createElement('div');
+    var dt = document.createElement('dt');
+    var dd = document.createElement('dd');
+    dt.textContent = term;
+    dd.textContent = value;
+    row.append(dt, dd);
+    return row;
+  }
+
+  function actionButton(label, action, isActive) {
+    var btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'btn btn--quiet';
+    btn.dataset.action = action;
+    btn.textContent = label;
+    if (isActive) btn.classList.add('is-active');
+    return btn;
+  }
+
+  function createTodo(todo, isNew) {
+    var li = document.createElement('li');
+    li.className = 'todo';
+    li.dataset.id = todo.id;
+    if (todo.isPriority) li.classList.add('todo--priority');
+    else if (todo.onProgress) li.classList.add('todo--progress');
+    if (isNew) li.classList.add('todo--new');
+
+    var body = document.createElement('article');
+    body.className = 'todo__body';
+
+    var head = document.createElement('div');
+    head.className = 'todo__head';
+
+    var title = document.createElement('h3');
+    title.className = 'todo__title';
+    title.textContent = todo.judul;
+    head.append(title);
+
+    if (todo.isPriority) head.append(chip('Prioritas', 'priority'));
+    else if (todo.onProgress) head.append(chip('Dikerjakan', 'progress'));
+
+    body.append(head);
+
+    if (todo.detail) {
+      var detail = document.createElement('p');
+      detail.className = 'todo__detail';
+      detail.textContent = todo.detail;
+      body.append(detail);
+    }
+
+    if (todo.referensi) {
+      var link = document.createElement('a');
+      link.className = 'todo__link';
+      link.href = todo.referensi;
+      link.target = '_blank';
+      link.rel = 'noopener noreferrer';
+      link.textContent = todo.referensi;
+      body.append(link);
+    }
+
+    var due = formatDue(todo);
+    if (due) {
+      var meta = document.createElement('dl');
+      meta.className = 'todo__meta';
+      meta.append(metaRow('Tenggat', due));
+
+      var countdownRow = document.createElement('div');
+      var ct = document.createElement('dt');
+      ct.textContent = 'Sisa waktu';
+      var cd = document.createElement('dd');
+      cd.className = 'todo__countdown';
+      cd.dataset.due = String(dueTime(todo));
+      cd.textContent = '\u2026';
+      countdownRow.append(ct, cd);
+      meta.append(countdownRow);
+
+      body.append(meta);
+    }
+
+    var actions = document.createElement('div');
+    actions.className = 'todo__actions';
+
+    var progressBtn = actionButton(todo.onProgress ? 'Jeda' : 'Proses', 'progress', todo.onProgress);
+    progressBtn.setAttribute('aria-pressed', String(todo.onProgress));
+
+    var priorityBtn = actionButton(
+      todo.isPriority ? 'Batal prioritas' : 'Prioritas',
+      'priority',
+      todo.isPriority
+    );
+    priorityBtn.setAttribute('aria-pressed', String(todo.isPriority));
+
+    var editBtn = actionButton('Edit', 'edit', false);
+    var doneBtn = actionButton('Selesai', 'done', false);
+
+    actions.append(progressBtn, priorityBtn, editBtn, doneBtn);
+    body.append(actions);
+    li.append(body);
+
+    return li;
+  }
+
+  /* ---------------- render ---------------- */
+
+  function summaryText(todos) {
+    if (todos.length === 0) return 'Belum ada rencana';
+    var priority = todos.filter(function (t) { return t.isPriority; }).length;
+    var base = todos.length + ' rencana';
+    return priority > 0 ? base + ', ' + priority + ' prioritas' : base;
+  }
+
+  function render(newId) {
+    var sorted = state.todos.slice().sort(compare);
+    var fragment = document.createDocumentFragment();
+
+    sorted.forEach(function (todo) {
+      fragment.append(createTodo(todo, todo.id === newId));
+    });
+
+    el.list.replaceChildren(fragment);
+    el.list.hidden = sorted.length === 0;
+    el.empty.hidden = sorted.length > 0;
+    el.summary.textContent = summaryText(sorted);
+
+    tickCountdowns();
+    syncTimer();
+  }
+
+  function rerender(focus) {
+    render();
+    if (!focus) return;
+    var scope = el.list.querySelector('[data-id="' + focus.id.replace(/"/g, '\\"') + '"]');
+    var target = scope ? scope.querySelector('[data-action="' + focus.action + '"]') : null;
+    if (target) target.focus();
+    else el.addBtn.focus();
+  }
+
+  /* ---------------- countdown ---------------- */
+
+  function tickCountdowns() {
+    var nodes = el.list.querySelectorAll('[data-due]');
+    var now = Date.now();
+
+    nodes.forEach(function (node) {
+      var due = Number(node.dataset.due);
+      if (!Number.isFinite(due)) return;
+
+      var diff = due - now;
+      var overdue = diff < 0;
+
+      node.dataset.overdue = String(overdue);
+      node.textContent = overdue
+        ? 'Lewat ' + formatSpan(-diff)
+        : formatSpan(diff) + ' lagi';
+    });
+  }
+
+  var timer = null;
+
+  function startTimer() {
+    if (timer !== null) return;
+    timer = window.setInterval(tickCountdowns, 1000);
+  }
+
+  function stopTimer() {
+    if (timer === null) return;
+    window.clearInterval(timer);
+    timer = null;
+  }
+
+  function syncTimer() {
+    var hasDue = el.list.querySelector('[data-due]') !== null;
+    if (hasDue && !document.hidden) startTimer();
+    else stopTimer();
+  }
+
+  document.addEventListener('visibilitychange', function () {
+    if (document.hidden) {
+      stopTimer();
+    } else {
+      tickCountdowns();
+      syncTimer();
+    }
+  });
+
+  /* ---------------- form ---------------- */
+
+  function clearError() {
+    el.judulField.classList.remove('field--invalid');
+    el.judulError.hidden = true;
+    el.judul.removeAttribute('aria-invalid');
+  }
+
+  function showError() {
+    el.judulField.classList.add('field--invalid');
+    el.judulError.hidden = false;
+    el.judul.setAttribute('aria-invalid', 'true');
+  }
+
+  function openForm(id) {
+    var todo = id ? state.todos.find(function (t) { return t.id === id; }) : null;
+
+    state.editingId = todo ? todo.id : null;
+    el.formTitle.textContent = todo ? 'Edit rencana' : 'Rencana baru';
+    el.judul.value = todo ? todo.judul : '';
+    el.detail.value = todo ? todo.detail : '';
+    el.referensi.value = todo ? todo.referensi : '';
+    el.deadline.value = todo ? todo.deadline : '';
+    el.waktu.value = todo ? todo.waktu : '';
+
+    clearError();
+    el.form.hidden = false;
+    el.addBtn.setAttribute('aria-expanded', 'true');
+
+    el.form.scrollIntoView({
+      block: 'nearest',
+      behavior: prefersReduced() ? 'auto' : 'smooth'
+    });
+    el.judul.focus({ preventScroll: true });
+  }
+
+  function closeForm(moveFocus) {
+    el.form.hidden = true;
+    el.addBtn.setAttribute('aria-expanded', 'false');
+    state.editingId = null;
+    clearError();
+    if (moveFocus) el.addBtn.focus();
+  }
+
+  el.addBtn.addEventListener('click', function () {
+    if (el.form.hidden) openForm(null);
+    else closeForm(true);
+  });
+
+  el.cancelBtn.addEventListener('click', function () { closeForm(true); });
+
+  el.judul.addEventListener('input', function () {
+    if (!el.judulError.hidden && el.judul.value.trim()) clearError();
+  });
+
+  el.form.addEventListener('submit', function (event) {
+    event.preventDefault();
+
+    var judul = el.judul.value.trim();
+    if (!judul) {
+      showError();
+      el.judul.focus();
+      return;
+    }
+
+    var payload = {
+      judul: judul,
+      detail: el.detail.value.trim(),
+      referensi: normalizeUrl(el.referensi.value),
+      deadline: el.deadline.value,
+      waktu: el.waktu.value
+    };
+
+    var newId = null;
+
+    if (state.editingId) {
+      var existing = state.todos.find(function (t) { return t.id === state.editingId; });
+      if (existing) {
+        existing.judul = payload.judul;
+        existing.detail = payload.detail;
+        existing.referensi = payload.referensi;
+        existing.deadline = payload.deadline;
+        existing.waktu = payload.waktu;
       }
-
-      function saveTodos() {
-        try {
-          localStorage.setItem(STORAGE_KEY, JSON.stringify(todos));
-        } catch (e) {
-          /* quota exceeded: ignore */
-        }
-      }
-
-      /* ============================================
-         THEME
-         ============================================ */
-      function applyTheme(theme) {
-        document.documentElement.dataset.theme = theme;
-        const dark = theme === 'dark';
-        themeBtn.setAttribute('aria-pressed', String(dark));
-        themeBtn.setAttribute('aria-label', dark ? 'Aktifkan mode terang' : 'Aktifkan mode gelap');
-        themeIcon.className = dark ? 'ph ph-sun' : 'ph ph-moon';
-        themeLabel.textContent = dark ? 'Terang' : 'Gelap';
-      }
-
-      function toggleTheme() {
-        const next = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
-        if (document.startViewTransition) {
-          document.startViewTransition(() => {
-            applyTheme(next);
-            localStorage.setItem(THEME_KEY, next);
-          });
-        } else {
-          applyTheme(next);
-          localStorage.setItem(THEME_KEY, next);
-        }
-      }
-
-      /* ============================================
-         HELPERS
-         ============================================ */
-      const uid = () =>
-        (typeof crypto !== 'undefined' && crypto.randomUUID)
-          ? crypto.randomUUID()
-          : String(Date.now()) + '-' + Math.random().toString(36).slice(2, 9);
-
-      function deadlineTs(t) {
-        if (!t.deadline) return null;
-        const ts = new Date(t.deadline + 'T' + (t.time || '00:00')).getTime();
-        return Number.isFinite(ts) ? ts : null;
-      }
-
-      function formatCountdown(ms) {
-        const total = Math.max(0, Math.floor(ms / 1000));
-        const d = Math.floor(total / 86400);
-        const h = Math.floor((total % 86400) / 3600);
-        const m = Math.floor((total % 3600) / 60);
-        const parts = [];
-        if (d > 0) parts.push(d + ' hari');
-        if (h > 0) parts.push(h + ' jam');
-        if (m > 0 || parts.length === 0) parts.push(m + ' menit');
-        return parts.slice(0, 2).join(' ');
-      }
-
-      function sortTodos(arr) {
-        return [...arr].sort((a, b) => {
-          if (a.isPriority !== b.isPriority) return a.isPriority ? -1 : 1;
-          if (a.onProgress !== b.onProgress) return a.onProgress ? -1 : 1;
-          const da = deadlineTs(a);
-          const db = deadlineTs(b);
-          if (da !== null && db !== null) return da - db;
-          if (da !== null) return -1;
-          if (db !== null) return 1;
-          return 0;
-        });
-      }
-
-      function findTodo(id) {
-        return todos.find((t) => t.id === id) || null;
-      }
-
-      /* ============================================
-         RENDER
-         ============================================ */
-      function render() {
-        const sorted = sortTodos(todos);
-        listEl.textContent = '';
-        const hasPriority = sorted.some((t) => t.isPriority);
-        const now = Date.now();
-
-        sorted.forEach((t, i) => {
-          listEl.appendChild(createTodoEl(t, i, hasPriority, now));
-        });
-
-        const total = sorted.length;
-        const countText = total === 0 ? 'Belum ada tugas' : total + ' tugas';
-        if (listCount.textContent !== countText) listCount.textContent = countText;
-        if (footerCount.textContent !== countText) footerCount.textContent = countText;
-
-        emptyEl.hidden = total > 0;
-        startCountdownTicker();
-      }
-
-      function createTodoEl(t, index, hasPriority, now) {
-        const article = document.createElement('article');
-        article.className = 'todo';
-        article.setAttribute('role', 'listitem');
-        article.setAttribute('data-id', t.id);
-
-        const dlTs = deadlineTs(t);
-        const isOverdue = dlTs !== null && dlTs < now;
-
-        if (t.isPriority) article.classList.add('todo--priority');
-        else if (t.onProgress) article.classList.add('todo--progress');
-        if (isOverdue) article.classList.add('todo--overdue');
-
-        /* --- Meta: tags + index --- */
-        const meta = document.createElement('div');
-        meta.className = 'todo__meta';
-
-        const tags = document.createElement('div');
-        tags.className = 'todo__tags';
-
-        if (t.isPriority) tags.appendChild(makeTag('ph-fill ph-fire', 'Prioritas', 'tag--priority'));
-        if (t.onProgress) tags.appendChild(makeTag('ph ph-spinner', 'Dikerjakan', 'tag--progress'));
-        if (isOverdue) tags.appendChild(makeTag('ph-fill ph-warning-circle', 'Lewat tenggat', ''));
-
-        meta.appendChild(tags);
-
-        const idx = document.createElement('span');
-        idx.className = 'todo__index';
-        idx.textContent = String(index + 1).padStart(2, '0');
-        meta.appendChild(idx);
-
-        article.appendChild(meta);
-
-        /* --- Title --- */
-        const h3 = document.createElement('h3');
-        h3.className = 'todo__title';
-        h3.textContent = t.judul;
-        article.appendChild(h3);
-
-        /* --- Detail --- */
-        if (t.detail && t.detail.trim()) {
-          const p = document.createElement('p');
-          p.className = 'todo__detail';
-          p.textContent = t.detail;
-          article.appendChild(p);
-        }
-
-        /* --- Link --- */
-        if (t.referensi && t.referensi.trim()) {
-          const a = document.createElement('a');
-          a.className = 'todo__link';
-          a.href = t.referensi;
-          a.target = '_blank';
-          a.rel = 'noopener noreferrer';
-
-          const icon = document.createElement('i');
-          icon.className = 'ph ph-link';
-          icon.setAttribute('aria-hidden', 'true');
-
-          const span = document.createElement('span');
-          span.textContent = t.referensi;
-
-          a.appendChild(icon);
-          a.appendChild(span);
-          article.appendChild(a);
-        }
-
-        /* --- Deadline --- */
-        if (dlTs !== null) {
-          const dl = document.createElement('div');
-          dl.className = 'todo__deadline';
-          dl.setAttribute('role', 'timer');
-          dl.setAttribute('aria-live', 'off');
-          dl.dataset.deadline = String(dlTs);
-          dl.dataset.overdue = String(isOverdue);
-
-          const icon = document.createElement('i');
-          icon.className = 'ph ph-clock';
-          icon.setAttribute('aria-hidden', 'true');
-
-          const span = document.createElement('span');
-          span.className = 'todo__countdown';
-
-          dl.appendChild(icon);
-          dl.appendChild(span);
-          updateCountdownEl(dl, dlTs, now);
-          article.appendChild(dl);
-        }
-
-        /* --- Actions --- */
-        const actions = document.createElement('div');
-        actions.className = 'todo__actions';
-
-        actions.appendChild(makeAction({
-          icon: t.onProgress ? 'ph ph-arrow-u-up-left' : 'ph ph-play',
-          label: t.onProgress ? 'Tandai belum dikerjakan' : 'Tandai sedang dikerjakan',
-          text: t.onProgress ? 'Nanti' : 'Proses',
-          pressed: t.onProgress,
-          onClick: () => toggleField(t.id, 'onProgress'),
-        }));
-
-        if (!hasPriority || t.isPriority) {
-          actions.appendChild(makeAction({
-            icon: 'ph ph-fire',
-            label: t.isPriority ? 'Batalkan prioritas' : 'Tandai sebagai prioritas',
-            text: t.isPriority ? 'Batal' : 'Prioritas',
-            pressed: t.isPriority,
-            onClick: () => toggleField(t.id, 'isPriority'),
-          }));
-        }
-
-        actions.appendChild(makeAction({
-          icon: 'ph ph-pencil-simple',
-          label: 'Edit tugas',
-          text: 'Edit',
-          onClick: () => openForm(t.id),
-        }));
-
-        actions.appendChild(makeAction({
-          icon: 'ph ph-check-circle',
-          label: 'Tandai selesai dan hapus',
-          text: 'Selesai',
-          variant: 'action--danger',
-          onClick: () => markDone(t.id),
-        }));
-
-        article.appendChild(actions);
-        return article;
-      }
-
-      function makeTag(iconClass, text, extraClass) {
-        const tag = document.createElement('span');
-        tag.className = 'tag' + (extraClass ? ' ' + extraClass : '');
-        const icon = document.createElement('i');
-        icon.className = iconClass;
-        icon.setAttribute('aria-hidden', 'true');
-        tag.appendChild(icon);
-        tag.appendChild(document.createTextNode(' ' + text));
-        return tag;
-      }
-
-      function makeAction({ icon, label, text, pressed = null, variant = '', onClick }) {
-        const btn = document.createElement('button');
-        btn.type = 'button';
-        btn.className = 'action' + (variant ? ' ' + variant : '');
-        btn.setAttribute('aria-label', label);
-        if (pressed !== null) btn.setAttribute('aria-pressed', String(pressed));
-
-        const iconEl = document.createElement('i');
-        iconEl.className = icon;
-        iconEl.setAttribute('aria-hidden', 'true');
-
-        const textEl = document.createElement('span');
-        textEl.textContent = text;
-
-        btn.appendChild(iconEl);
-        btn.appendChild(textEl);
-        btn.addEventListener('click', onClick);
-        return btn;
-      }
-
-      function updateCountdownEl(el, dlTs, now) {
-        const span = el.querySelector('.todo__countdown');
-        if (!span) return;
-        const diff = dlTs - now;
-        if (diff <= 0) {
-          span.textContent = diff > -86400000
-            ? 'Lewat ' + formatCountdown(-diff)
-            : 'Tenggat lewat';
-        } else {
-          span.textContent = 'Sisa ' + formatCountdown(diff);
-        }
-      }
-
-      function tickCountdowns() {
-        const now = Date.now();
-        $$('.todo__deadline').forEach((el) => {
-          const ts = Number(el.dataset.deadline);
-          if (!Number.isFinite(ts)) return;
-          updateCountdownEl(el, ts, now);
-          const overdue = ts < now;
-          if (overdue !== (el.dataset.overdue === 'true')) {
-            el.dataset.overdue = String(overdue);
-          }
-        });
-      }
-
-      function startCountdownTicker() {
-        if (countdownTimer) clearInterval(countdownTimer);
-        tickCountdowns();
-        countdownTimer = setInterval(tickCountdowns, TICK_MS);
-      }
-
-      /* ============================================
-         ACTIONS
-         ============================================ */
-      function toggleField(id, field) {
-        const t = findTodo(id);
-        if (!t) return;
-
-        // Ingat tombol yang sedang fokus untuk restore setelah re-render
-        const active = document.activeElement;
-        const focusLabel = active ? active.getAttribute('aria-label') : null;
-
-        if (field === 'isPriority' && !t.isPriority) {
-          // Hanya satu prioritas sekaligus
-          todos.forEach((x) => { x.isPriority = false; });
-        }
-        t[field] = !t[field];
-        saveTodos();
-        render();
-
-        if (focusLabel) {
-          const next = listEl.querySelector(
-            'button[aria-label="' + CSS.escape(focusLabel) + '"]'
-          );
-          if (next) next.focus();
-        }
-      }
-
-      function markDone(id) {
-        const t = findTodo(id);
-        if (!t) return;
-
-        const card = listEl.querySelector('[data-id="' + CSS.escape(id) + '"]');
-        const removeAndSave = () => {
-          todos = todos.filter((x) => x.id !== id);
-          saveTodos();
-          render();
-          openFormBtn.focus();
-        };
-
-        if (!card) { removeAndSave(); return; }
-
-        card.classList.add('todo--done');
-        setTimeout(() => {
-          if (document.startViewTransition) {
-            document.startViewTransition(removeAndSave);
-          } else {
-            removeAndSave();
-          }
-        }, 500);
-      }
-
-      function openForm(id = null) {
-        editingId = id;
-        const t = id ? findTodo(id) : null;
-
-        judul.value = t ? t.judul : '';
-        detail.value = t ? t.detail || '' : '';
-        referensi.value = t ? t.referensi || '' : '';
-        deadline.value = t ? t.deadline || '' : '';
-        time.value = t ? t.time || '' : '';
-
-        judulErr.textContent = '';
-        referensiErr.textContent = '';
-        judul.removeAttribute('aria-invalid');
-        referensi.removeAttribute('aria-invalid');
-
-        form.dataset.open = 'true';
-        formMeta.textContent = id ? 'Edit' : 'Baru';
-        openFormBtn.setAttribute('aria-expanded', 'true');
-
-        requestAnimationFrame(() => {
-          judul.focus({ preventScroll: false });
-          form.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        });
-      }
-
-      function hideForm() {
-        form.dataset.open = 'false';
-        openFormBtn.setAttribute('aria-expanded', 'false');
-        editingId = null;
-        form.reset();
-        judulErr.textContent = '';
-        referensiErr.textContent = '';
-        judul.removeAttribute('aria-invalid');
-        referensi.removeAttribute('aria-invalid');
-      }
-
-      function validate() {
-        let valid = true;
-        judulErr.textContent = '';
-        referensiErr.textContent = '';
-        judul.removeAttribute('aria-invalid');
-        referensi.removeAttribute('aria-invalid');
-
-        if (!judul.value.trim()) {
-          judulErr.textContent = 'Judul wajib diisi.';
-          judul.setAttribute('aria-invalid', 'true');
-          valid = false;
-        }
-
-        const ref = referensi.value.trim();
-        if (ref && !/^https?:\/\//i.test(ref)) {
-          referensiErr.textContent = 'Link harus diawali https:// atau http://.';
-          referensi.setAttribute('aria-invalid', 'true');
-          valid = false;
-        }
-
-        if (!valid) {
-          const first = form.querySelector('[aria-invalid="true"]');
-          if (first) first.focus();
-        }
-        return valid;
-      }
-
-      function submitForm(e) {
-        e.preventDefault();
-        if (!validate()) return;
-
-        const existing = editingId ? findTodo(editingId) : null;
-        const data = {
-          judul: judul.value.trim(),
-          detail: detail.value.trim(),
-          referensi: referensi.value.trim(),
-          deadline: deadline.value,
-          time: time.value,
-          onProgress: existing ? existing.onProgress : false,
-          isPriority: existing ? existing.isPriority : false,
-        };
-
-        if (existing) {
-          Object.assign(existing, data);
-        } else {
-          todos.push({ id: uid(), ...data });
-        }
-
-        saveTodos();
-        hideForm();
-
-        const doRender = () => render();
-        if (document.startViewTransition) {
-          document.startViewTransition(doRender);
-        } else {
-          doRender();
-        }
-      }
-
-      /* ============================================
-         INIT
-         ============================================ */
-      function init() {
-        loadTodos();
-
-        const savedTheme = localStorage.getItem(THEME_KEY);
-        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-        applyTheme(savedTheme || (prefersDark ? 'dark' : 'light'));
-
-        openFormBtn.addEventListener('click', () => {
-          if (form.dataset.open === 'true' && editingId === null) hideForm();
-          else openForm();
-        });
-
-        cancelBtn.addEventListener('click', () => {
-          hideForm();
-          openFormBtn.focus();
-        });
-
-        form.addEventListener('submit', submitForm);
-        themeBtn.addEventListener('click', toggleTheme);
-
-        render();
-      }
-
-      if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', init);
-      } else {
-        init();
-      }
-    })();
-  </script>
+    } else {
+      var fresh = normalize(payload);
+      newId = fresh.id;
+      state.todos.push(fresh);
+    }
+
+    persist();
+    closeForm(false);
+    render(newId);
+    el.addBtn.focus();
+  });
+
+  /* ---------------- list actions ---------------- */
+
+  el.list.addEventListener('click', function (event) {
+    var button = event.target.closest('[data-action]');
+    if (!button) return;
+
+    var item = button.closest('[data-id]');
+    if (!item) return;
+
+    var id = item.dataset.id;
+    var todo = state.todos.find(function (t) { return t.id === id; });
+    if (!todo) return;
+
+    var action = button.dataset.action;
+
+    if (action === 'progress') {
+      todo.onProgress = !todo.onProgress;
+      persist();
+      rerender({ id: id, action: 'progress' });
+      return;
+    }
+
+    if (action === 'priority') {
+      todo.isPriority = !todo.isPriority;
+      persist();
+      rerender({ id: id, action: 'priority' });
+      return;
+    }
+
+    if (action === 'edit') {
+      openForm(id);
+      return;
+    }
+
+    if (action === 'done') {
+      askDelete(todo);
+    }
+  });
+
+  /* ---------------- dialog ---------------- */
+
+  function askDelete(todo) {
+    state.pendingDeleteId = todo.id;
+    el.dialogText.textContent = '\u201C' + todo.judul + '\u201D akan dihapus dari daftar.';
+    el.dialog.showModal();
+  }
+
+  el.dialog.addEventListener('click', function (event) {
+    var button = event.target.closest('[data-dialog]');
+    if (!button) return;
+
+    if (button.dataset.dialog === 'cancel') {
+      state.pendingDeleteId = null;
+      el.dialog.close();
+      return;
+    }
+
+    var id = state.pendingDeleteId;
+    state.pendingDeleteId = null;
+    el.dialog.close();
+
+    if (!id) return;
+
+    state.todos = state.todos.filter(function (t) { return t.id !== id; });
+    persist();
+    render();
+    el.addBtn.focus();
+  });
+
+  el.dialog.addEventListener('cancel', function () {
+    state.pendingDeleteId = null;
+  });
+
+  /* ---------------- theme ---------------- */
+
+  function applyTheme(mode) {
+    var dark = mode === 'dark';
+    document.documentElement.dataset.theme = dark ? 'dark' : 'light';
+    el.themeToggle.setAttribute('aria-pressed', String(dark));
+    el.themeLabel.textContent = dark ? 'Mode terang' : 'Mode gelap';
+    try { localStorage.setItem(THEME_KEY, dark ? 'dark' : 'light'); } catch (err) {}
+  }
+
+  el.themeToggle.addEventListener('click', function () {
+    var next = document.documentElement.dataset.theme === 'dark' ? 'light' : 'dark';
+    applyTheme(next);
+  });
+
+  /* ---------------- boot ---------------- */
+
+  load();
+  applyTheme(document.documentElement.dataset.theme === 'dark' ? 'dark' : 'light');
+  render();
+})();
+</script>
 </body>
 </html>
